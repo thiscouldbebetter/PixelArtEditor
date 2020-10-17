@@ -1,353 +1,67 @@
 <html>
 <body>
 
+<h3>Pixel Art Editor</h3>
+
 <div id="divMain">
+
 	<div id="divSize">
-		<label>Size:</label>
+
+		<label>Size in Pixels:</label>
 		<input id="inputSizeX" type="number" value="16" style="width:64px"></input>
 		<label>x</label>
 		<input id="inputSizeY" type="number" value="16" style="width:64px"></input>
-		<button onclick="Session.Instance.buttonSizeChange_Clicked();">Change</button>
+		<br />
+
+		<label>Magnification Factor:</label>
+		<input id="inputMagnificationFactor" type="number" style="width:64px" value="16"></input>
+		<button onclick="Session.Instance().buttonSizeChange_Clicked();">Change</button>
 	</div>
-	<div id="divImages">
-	</div>
+
+	<div id="divImages"></div>
+
 	<div id="divFileOperations">
 		<label>Load:</label>
-		<input type="file" onchange="Session.Instance.inputFileToLoad_Changed(this);"></input>
-		<button onclick="Session.Instance.buttonSave_Clicked();">Save</button>
+		<input type="file" onchange="Session.Instance().inputFileToLoad_Changed(this);"></input>
+		<button onclick="Session.Instance().buttonSave_Clicked();">Save</button>
 	</div>
+
 	<div>
-		<button onclick="Session.Instance.buttonClear_Clicked();">Clear</button>
+		<button onclick="Session.Instance().buttonClear_Clicked();">Clear</button>
 	</div>
+
 	<div id="divColors">
-		<label>Colors:</label>
+		<label>Color Selected:</label>
+		<button id="buttonColorSwatch" style="background-color:Black">&nbsp;</button>
+		<button onclick="Session.Instance().buttonFlood_Clicked();">Flood</button>
+		<label>Erase:</label>
+		<input id="checkboxErase" type="checkbox" onchange="Session.Instance().checkboxErase_Changed(this)";></input>
 		<div>
-			<button onclick="Session.Instance.buttonColorFromRGB_Clicked();">From RGBA:</button>
+			<button onclick="Session.Instance().buttonColorFromRGB_Clicked();">Set From:</button>
+			<label>Red:</label>
 			<input id="inputColorRed" type="number" value="128" style="width:64px"></input>
+			<label>Green:</label>
 			<input id="inputColorGreen" type="number" value="128" style="width:64px"></input>
+			<label>Blue:</label>
 			<input id="inputColorBlue" type="number" value="128" style="width:64px"></input>
+			<label>Opacity:</label>
 			<input id="inputColorAlpha" type="number" value=".5" style="width:64px"></input>
 		</div>
 		<div id="divColorsPredefined"></div>
 	</div>
 
 </div>
+
+<script type="text/javascript" src="Coords.js"></script>
+<script type="text/javascript" src="Display.js"></script>
+<script type="text/javascript" src="Session.js"></script>
  
 <script type="text/javascript">
- 
-// main
- 
+  
 function main()
 { 
-	Session.Instance.initialize();
+	Session.Instance().initialize();
 }
- 
-// classes
- 
-function Coords(x, y)
-{
-	this.x = x;
-	this.y = y;
-}
-{
-	Coords.prototype.clone = function()
-	{
-		return new Coords(this.x, this.y);
-	}
- 
-	Coords.prototype.divide = function(other)
-	{
-		this.x /= other.x;
-		this.y /= other.y;
-		return this;
-	}
- 
-	Coords.prototype.floor = function()
-	{
-		this.x = Math.floor(this.x);
-		this.y = Math.floor(this.y);
-		return this;
-	}
- 
-	Coords.prototype.multiply = function(other)
-	{
-		this.x *= other.x;
-		this.y *= other.y;
-		return this;
-	}
- 
-	Coords.prototype.multiplyScalar = function(scalar)
-	{
-		this.x *= scalar;
-		this.y *= scalar;
-		return this;
-	}
- 
-}
- 
-function Display(sizeInPixels)
-{
-	this.sizeInPixels = sizeInPixels;
-}
-{
-	Display.prototype.drawImage = function(image)
-	{
-		this.graphics.drawImage
-		(
-			image,
-			0, 0
-		);
-	}
- 
-	Display.prototype.drawImageStretched = function(image)
-	{
-		this.graphics.drawImage
-		(
-			image,
-			0, 0,
-			this.sizeInPixels.x, this.sizeInPixels.y
-		);
-	}
- 
-	Display.prototype.drawPixel = function(color, pos)
-	{
-		this.graphics.fillStyle = color;
-		this.graphics.fillRect
-		(
-			pos.x, pos.y, 1, 1
-		);
-	}
- 
-	Display.prototype.drawRectangle = function(color, pos, size)
-	{
-		this.graphics.fillStyle = color;
-		this.graphics.fillRect
-		(
-			pos.x, pos.y, size.x, size.y
-		);
-	}
- 
-	Display.prototype.fillWithColor = function(color)
-	{
-		this.drawRectangle(color, new Coords(0, 0), this.sizeInPixels);
-	}
- 
-	Display.prototype.initialize = function(domElementParent)
-	{
-		this.canvas = document.createElement("canvas");
-		this.canvas.style = "border:1px solid;" 
-		this.canvas.width = this.sizeInPixels.x;
-		this.canvas.height = this.sizeInPixels.y;
- 
-		domElementParent.appendChild(this.canvas);
-	 
-		this.graphics = this.canvas.getContext("2d");
-		this.graphics.imageSmoothingEnabled = false;
- 
-		this.fillWithColor("White");
-	}
-}
- 
-function Session(imageSizeInPixelsActual, magnificationFactor, colors)
-{
-	this.imageSizeInPixelsActual = imageSizeInPixelsActual;
-	this.magnificationFactor = magnificationFactor;
-	this.colors = colors;
-}
-{
-	Session.Instance = new Session
-	(
-		new Coords(16, 16), // imageSizeInPixelsActual
-		16, // magnificationFactor
-		// colors
-		[
-			"Black",
-			"White",
-			"Red",
-			"Orange",
-			"Yellow",
-			"Green",
-			"Blue",
-			"Violet",
-			"Brown",
-			"Gray", 
-		]
-	);
-
-
-	// methods
- 
-	Session.prototype.initialize = function()
-	{
-		this.imageSizeInPixelsMagnified = this.imageSizeInPixelsActual.clone().multiplyScalar
-		(
-			this.magnificationFactor
-		);
- 
-		this.cellSizeInPixels = new Coords(1, 1).multiplyScalar
-		(
-			this.magnificationFactor
-		);
-    
-		var divImages = document.getElementById("divImages");
-		divImages.innerHTML = "";
- 
-		this.displayMagnified = new Display(this.imageSizeInPixelsMagnified);
-		this.displayMagnified.initialize(divImages);
-		this.displayMagnified.canvas.onmousemove = 
-			this.canvasMagnified_MouseMoved.bind(this);
-
-		this.displayActualSize = new Display(this.imageSizeInPixelsActual);
-		this.displayActualSize.initialize(divImages);
-
-		this.colorSelected = this.colors[0];
- 
-		var divColorsPredefined = document.getElementById("divColorsPredefined");
-		divColorsPredefined.innerHTML = "";
- 
-		for (var i = 0; i < this.colors.length; i++)
-		{
-			var color = this.colors[i];
-			var buttonColor = document.createElement("button");
-			buttonColor.innerHTML = color;
-			buttonColor.style.color = color;
-			buttonColor.onclick = this.buttonColor_Clicked.bind(this);
-			divColorsPredefined.appendChild(buttonColor);
-		} 
-	}
- 
-	// ui events
- 
-	Session.prototype.buttonClear_Clicked = function()
-	{
-		this.displayMagnified.fillWithColor(this.colorSelected);
-		this.displayActualSize.fillWithColor(this.colorSelected);
-	}
- 
-	Session.prototype.buttonColor_Clicked = function(event)
-	{
-		var buttonColor = event.target;
-		this.colorSelected = buttonColor.innerHTML;
-	}
-
-	Session.prototype.buttonColorFromRGB_Clicked = function(event)
-	{
-		var d = document;
-		var inputColorRed = d.getElementById("inputColorRed");
-		var inputColorGreen = d.getElementById("inputColorGreen");
-		var inputColorBlue = d.getElementById("inputColorBlue");
-		var inputColorAlpha = d.getElementById("inputColorAlpha");
-		var red = inputColorRed.value;
-		var green = inputColorGreen.value;
-		var blue = inputColorBlue.value;
-		var alpha = inputColorAlpha.value;
-		var colorFromRGBA = "rgba(" + red + "," + green + "," + blue + "," + alpha + ")";
-		this.colorSelected = colorFromRGBA;
-	}
-
-	Session.prototype.buttonSizeChange_Clicked = function(event)
-	{
-		var d = document;
-		var inputSizeX = d.getElementById("inputSizeX")
-		var inputSizeY = d.getElementById("inputSizeY")
-		this.imageSizeInPixelsActual.x = inputSizeX.value;
-		this.imageSizeInPixelsActual.y = inputSizeY.value;
-		this.initialize();
-	} 
- 
-	Session.prototype.buttonSave_Clicked = function()
-	{
-		var canvas = this.displayActualSize.canvas;
- 
-		var imageFromCanvasURL = canvas.toDataURL("image/png");
- 
-		var imageAsByteString = atob(imageFromCanvasURL.split(',')[1]);
-		var imageAsArrayBuffer = new ArrayBuffer(imageAsByteString.length);
-		var imageAsArrayUnsigned = new Uint8Array(imageAsArrayBuffer);
-		for (var i = 0; i < imageAsByteString.length; i++) 
-		{
-			imageAsArrayUnsigned[i] = imageAsByteString.charCodeAt(i);
-		}
-		var imageAsBlob = new Blob([imageAsArrayBuffer], {type:'image/png'});
- 
-		var link = document.createElement("a");
-		link.href = window.URL.createObjectURL(imageAsBlob);
-		link.download = "Image.png";
-		link.click();
-	}
- 
-	Session.prototype.canvasMagnified_MouseMoved = function(event)
-	{
-		if (event.buttons == 0)
-		{
-			return;
-		}
- 
-		var canvas = event.target;
-		var canvasBounds = canvas.getBoundingClientRect();
- 
-		var clickPosInPixels = new Coords
-		(
-			event.clientX - canvasBounds.left, 
-			event.clientY - canvasBounds.top
-		);
- 
-		var clickPosInCells = clickPosInPixels.clone().divide
-		(
-			this.cellSizeInPixels
-		).floor();
- 
-		var cellPosInPixels = clickPosInCells.clone().multiply
-		(
-			this.cellSizeInPixels
-		);
- 
-		var color = this.colorSelected;
- 
-		this.displayMagnified.drawRectangle
-		(
-			color,
-			cellPosInPixels,
-			this.cellSizeInPixels
-		);
- 
-		this.displayActualSize.drawPixel
-		(
-			color,
-			clickPosInCells
-		);
-	}
- 
-	Session.prototype.inputFileToLoad_Changed = function(inputFileToLoad)
-	{
-		var fileToLoad = inputFileToLoad.files[0];
-		if (fileToLoad != null)
-		{
-			if (fileToLoad.type.match("image.*") != null)
-			{
-				var fileReader = new FileReader();
-				fileReader.onload = this.inputFileToLoad_Changed_Loaded.bind(this); 
-				fileReader.readAsDataURL(fileToLoad);
-			}
-		}
-	}
- 
-	Session.prototype.inputFileToLoad_Changed_Loaded = function(fileLoadedEvent) 
-	{
-		var imageLoaded = document.createElement("img");
-		imageLoaded.src = fileLoadedEvent.target.result;
- 
-		this.imageSizeInPixelsActual.x = imageLoaded.width;
-		this.imageSizeInPixelsActual.y = imageLoaded.height;
- 
-		this.initialize();
- 
-		this.displayActualSize.drawImage(imageLoaded);
-		this.displayMagnified.drawImageStretched(imageLoaded);
-	} 
-}
- 
-// run
  
 main();
  
