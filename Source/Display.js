@@ -18,12 +18,32 @@ class Display
 		);
 	}
 
-	drawImage(image)
+	clearRectangle(pos, size)
+	{
+		this.graphics.clearRect
+		(
+			pos.x, pos.y, size.x, size.y
+		);
+	}
+
+	drawImage(image, pos)
+	{
+		pos = pos || new Coords(0, 0);
+		this.graphics.drawImage
+		(
+			image, pos.x, pos.y
+		);
+	}
+ 
+	drawImagePartial(image, posToDrawFrom, size, posToDrawTo)
 	{
 		this.graphics.drawImage
 		(
 			image,
-			0, 0
+			posToDrawFrom.x, posToDrawFrom.y,
+			size.x, size.y,
+			posToDrawTo.x, posToDrawTo.y,
+			size.x, size.y
 		);
 	}
  

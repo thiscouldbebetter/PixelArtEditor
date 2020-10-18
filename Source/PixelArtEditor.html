@@ -7,10 +7,33 @@
 
 	<div id="divSize">
 
-		<label>Size in Pixels:</label>
-		<input id="inputSizeX" type="number" value="16" style="width:64px"></input>
+		<label>Tileset Image:</label>
+		<br />
+
+		<div id="divImageTileset"></div>
+
+		<div id="divFileOperations">
+			<label>Load:</label>
+			<input type="file" onchange="Session.Instance().inputFileToLoad_Changed(this);"></input>
+			<button onclick="Session.Instance().buttonSave_Clicked();">Save</button>
+		</div>
+
+		<label>Tile Size in Pixels:</label>
+		<input id="inputTileSizeInPixelsX" type="number" value="16" style="width:64px"></input>
 		<label>x</label>
-		<input id="inputSizeY" type="number" value="16" style="width:64px"></input>
+		<input id="inputTileSizeInPixelsY" type="number" value="16" style="width:64px"></input>
+		<br />
+
+		<label>Image Size in Tiles:</label>
+		<input id="inputImageSizeInTilesX" type="number" value="4" style="width:64px"></input>
+		<label>x</label>
+		<input id="inputImageSizeInTilesY" type="number" value="4" style="width:64px"></input>
+		<br />
+
+		<label>Tile Selected:</label>
+		<input id="inputTileSelectedPosInTilesX" type="number" value="0" style="width:64px" disabled></input>
+		<label>x</label>
+		<input id="inputTileSelectedPosInTilesY" type="number" value="0" style="width:64px" disabled></input>
 		<br />
 
 		<label>Magnification Factor:</label>
@@ -18,13 +41,7 @@
 		<button onclick="Session.Instance().buttonSizeChange_Clicked();">Change</button>
 	</div>
 
-	<div id="divImages"></div>
-
-	<div id="divFileOperations">
-		<label>Load:</label>
-		<input type="file" onchange="Session.Instance().inputFileToLoad_Changed(this);"></input>
-		<button onclick="Session.Instance().buttonSave_Clicked();">Save</button>
-	</div>
+	<div id="divTileSelected"></div>
 
 	<div>
 		<button onclick="Session.Instance().buttonClear_Clicked();">Clear</button>
