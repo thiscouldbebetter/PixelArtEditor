@@ -237,13 +237,11 @@ class Session
 	{
 		var d = document;
 
+		var canvasTileset = this.displayImageTileset.canvas;
+		var imageTilesetAsUrl = canvasTileset.toDataURL("image/png");
+
 		var canvasTileSelectedActualSize = this.displayTileSelectedActualSize.canvas; 
 		var imageActualSizeAsUrl = canvasTileSelectedActualSize.toDataURL("image/png");
-		var imageActualSize = d.createElement("img");
-
-		var canvasMagnified = this.displayTileSelectedMagnified.canvas; 
-		var imageMagnifiedAsUrl = canvasMagnified.toDataURL("image/png");
-		var imageMagnified = d.createElement("img");
 
 		var inputTileSizeInPixelsX = d.getElementById("inputTileSizeInPixelsX");
 		var inputTileSizeInPixelsY = d.getElementById("inputTileSizeInPixelsY");
@@ -270,14 +268,20 @@ class Session
 
 		var session = this;
 
+		var imageTileset = d.createElement("img");
+		imageTileset.onload = () =>
+		{
+			session.displayImageTileset.drawImage(imageTileset, 0, 0);
+		}
+		imageTileset.src = imageTilesetAsUrl;
+
+		var imageActualSize = d.createElement("img");
 		imageActualSize.onload = () =>
 		{
 			session.displayTileSelectedActualSize.drawImage(imageActualSize, 0, 0);
 			session.drawMagnified();
 		}
-
 		imageActualSize.src = imageActualSizeAsUrl;
-
 	} 
  
 	buttonSave_Clicked()

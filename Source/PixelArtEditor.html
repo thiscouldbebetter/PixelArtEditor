@@ -18,17 +18,24 @@
 			<button onclick="Session.Instance().buttonSave_Clicked();">Save</button>
 		</div>
 
-		<label>Tile Size in Pixels:</label>
-		<input id="inputTileSizeInPixelsX" type="number" value="16" style="width:64px"></input>
-		<label>x</label>
-		<input id="inputTileSizeInPixelsY" type="number" value="16" style="width:64px"></input>
-		<br />
+		<div>
+			<label>Sizes:</label>
+			<button onclick="Session.Instance().buttonSizeChange_Clicked();">Update</button>
+			<br />
 
-		<label>Image Size in Tiles:</label>
-		<input id="inputImageSizeInTilesX" type="number" value="4" style="width:64px"></input>
-		<label>x</label>
-		<input id="inputImageSizeInTilesY" type="number" value="4" style="width:64px"></input>
-		<br />
+			<label>Tile Size in Pixels:</label>
+			<input id="inputTileSizeInPixelsX" type="number" value="16" style="width:64px"></input>
+			<label>x</label>
+			<input id="inputTileSizeInPixelsY" type="number" value="16" style="width:64px"></input>
+			<br />
+
+			<label>Image Size in Tiles:</label>
+			<input id="inputImageSizeInTilesX" type="number" value="4" style="width:64px"></input>
+			<label>x</label>
+			<input id="inputImageSizeInTilesY" type="number" value="4" style="width:64px"></input>
+			<br />
+		</div>
+
 
 		<label>Tile Selected:</label>
 		<input id="inputTileSelectedPosInTilesX" type="number" value="0" style="width:64px" disabled></input>
@@ -38,7 +45,7 @@
 
 		<label>Magnification Factor:</label>
 		<input id="inputMagnificationFactor" type="number" style="width:64px" value="16"></input>
-		<button onclick="Session.Instance().buttonSizeChange_Clicked();">Change</button>
+
 	</div>
 
 	<div id="divTileSelected"></div>
