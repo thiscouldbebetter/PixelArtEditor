@@ -19,6 +19,7 @@ class Session
 		this.imageTilesetSizeInPixels =
 			this.imageTilesetSizeInTiles.clone().multiply(this.tileSizeInPixelsActual);
 		this.isErasing = false;
+		this.isExtractingColor = false;
 	}
 
 	static Instance()
@@ -31,34 +32,42 @@ class Session
 				new Coords(16, 16), // tileSizeInPixelsActual
 				new Coords(0, 0), // tileSelectedPosInTiles
 				16, // magnificationFactor
-				// colors
-				[
-					"Black",
-					"Gray", 
-					"White",
-					"Red",
-					"Orange",
-					"Yellow",
-					"Green",
-					"Blue",
-					"Purple",
-
-					"Brown",
-					"Cyan",
-					"DarkGray",
-					"LightGray",
-					"LightGreen",
-					"LightBlue",
-					"Gold",
-					"Pink",
-					"Salmon",
-					"Violet",
-					"Tan",
-				]
+				Session.colorsDefault()
 			);
 		}
 		return Session._instance;
 	}
+
+	static colorsDefault()
+	{
+		var returnValues =
+		[
+			"Black",
+			"Gray", 
+			"White",
+			"Red",
+			"Orange",
+			"Yellow",
+			"Green",
+			"Blue",
+			"Purple",
+
+			"Brown",
+			"Cyan",
+			"DarkGray",
+			"LightGray",
+			"LightGreen",
+			"LightBlue",
+			"Gold",
+			"Pink",
+			"Salmon",
+			"Violet",
+			"Tan",
+		];
+		return returnValues;
+	}
+
+	// Instance methods.
 
 	colorSelect(colorToSelect)
 	{
@@ -87,67 +96,30 @@ class Session
 		inputColorBlue.value = colorComponentsRGBA[2];
 		inputColorAlpha.value = colorComponentsRGBA[3] / 255;
 	}
- 
-	initialize()
+
+	colorAddToPalette(colorToAdd)
 	{
-		this.tileSizeInPixelsMagnified = this.tileSizeInPixelsActual.clone().multiplyScalar
-		(
-			this.magnificationFactor
-		);
- 
-		this.cellSizeInPixels = new Coords(1, 1).multiplyScalar
-		(
-			this.magnificationFactor
-		);
-   
-		var d = document;
-
-		var divImageTileset = d.getElementById("divImageTileset");
-		divImageTileset.innerHTML = "";
-
-		this.displayImageTileset = new Display(this.imageTilesetSizeInPixels);
-		this.displayImageTileset.initialize(divImageTileset);
-		var canvas = this.displayImageTileset.canvas;
-		canvas.onmousedown = this.canvasImageTileset_MouseDown.bind(this);
-
-		var divTileSelected = d.getElementById("divTileSelected");
-		divTileSelected.innerHTML = "";
- 
-		this.displayTileSelectedMagnified = new Display(this.tileSizeInPixelsMagnified);
-		this.displayTileSelectedMagnified.initialize(divTileSelected);
-		canvas = this.displayTileSelectedMagnified.canvas;
-		canvas.onmousedown = this.canvasMagnified_MouseDown.bind(this);
-		canvas.onmousemove = this.canvasMagnified_MouseMoved.bind(this);
-
-		this.displayTileSelectedActualSize = new Display(this.tileSizeInPixelsActual);
-		this.displayTileSelectedActualSize.initialize(divTileSelected);
-
-		this.colorSelected = this.colors[0];
- 
-		var divColorsPredefined = d.getElementById("divColorsPredefined");
-		divColorsPredefined.innerHTML = "";
- 
-		var colorsPerRow = 4;
-
-		for (var i = 0; i < this.colors.length; i++)
+		var isColorNotInPalette =
+			(this.colors.indexOf(colorToAdd) == -1);
+		if (isColorNotInPalette)
 		{
-			if (i > 0 && i % colorsPerRow == 0)
-			{
-				divColorsPredefined.appendChild(d.createElement("br"));
-			}
+			this.colors.push(colorToAdd);
+			this.initializePalette();
+		}
+		var wasSuccessful = isColorNotInPalette;
+		return wasSuccessful;
+	}
 
-			var colorName = this.colors[i];
-			var buttonColor = d.createElement("button");
-			buttonColor.innerHTML = colorName;
-			buttonColor.style.backgroundColor = colorName;
-			buttonColor.style.width = "96px";
-			if (colorName == "Black")
-			{
-				buttonColor.style.color = "White";
-			}
-			buttonColor.onclick = this.buttonColor_Clicked.bind(this);
-			divColorsPredefined.appendChild(buttonColor);
-		} 
+	colorPaletteClear()
+	{
+		this.colors.length = 0;
+		this.initializePalette();
+	}
+
+	colorPaletteReset()
+	{
+		this.colors = Session.colorsDefault();
+		this.initializePalette();
 	}
 
 	drawMagnified()
@@ -196,6 +168,91 @@ class Session
 		);
 	}
  
+	initialize()
+	{
+		this.initializeForImageTileset();
+		this.initializePalette();
+		this.colorSelect(this.colors[0]);
+	}
+
+	initializeForImageTileset()
+	{
+		this.tileSizeInPixelsMagnified = this.tileSizeInPixelsActual.clone().multiplyScalar
+		(
+			this.magnificationFactor
+		);
+ 
+		this.cellSizeInPixels = new Coords(1, 1).multiplyScalar
+		(
+			this.magnificationFactor
+		);
+   
+		var d = document;
+
+		var inputTileSizeInPixelsX = d.getElementById("inputTileSizeInPixelsX");
+		var inputTileSizeInPixelsY = d.getElementById("inputTileSizeInPixelsY");
+		var inputImageSizeInTilesX = d.getElementById("inputImageSizeInTilesX");
+		var inputImageSizeInTilesY = d.getElementById("inputImageSizeInTilesY");
+
+		inputTileSizeInPixelsX.value = this.tileSizeInPixelsActual.x;
+		inputTileSizeInPixelsY.value = this.tileSizeInPixelsActual.y;
+		inputImageSizeInTilesX.value = this.imageTilesetSizeInTiles.x;
+		inputImageSizeInTilesY.value = this.imageTilesetSizeInTiles.y;
+
+		var divImageTileset = d.getElementById("divImageTileset");
+		divImageTileset.innerHTML = "";
+
+		this.displayImageTileset = new Display(this.imageTilesetSizeInPixels);
+		this.displayImageTileset.initialize(divImageTileset);
+		var canvas = this.displayImageTileset.canvas;
+		canvas.onmousedown = this.canvasImageTileset_MouseDown.bind(this);
+
+		var divTileSelected = d.getElementById("divTileSelected");
+		divTileSelected.innerHTML = "[none]";
+	}
+
+	initializeForTileSelected()
+	{
+		var d = document;
+
+		var divTileSelected = d.getElementById("divTileSelected");
+		divTileSelected.innerHTML = "";
+ 
+		this.displayTileSelectedMagnified = new Display(this.tileSizeInPixelsMagnified);
+		this.displayTileSelectedMagnified.initialize(divTileSelected);
+		var canvas = this.displayTileSelectedMagnified.canvas;
+		canvas.onmousedown = this.canvasMagnified_MouseDown.bind(this);
+		canvas.onmousemove = this.canvasMagnified_MouseMoved.bind(this);
+
+		this.displayTileSelectedActualSize = new Display(this.tileSizeInPixelsActual);
+		this.displayTileSelectedActualSize.initialize(divTileSelected);
+	}
+
+	initializePalette()
+	{ 
+		var d = document;
+
+		var divColorsPredefined = d.getElementById("divColorsPredefined");
+		divColorsPredefined.innerHTML = "";
+ 
+		var colorsPerRow = 16;
+
+		for (var i = 0; i < this.colors.length; i++)
+		{
+			if (i > 0 && i % colorsPerRow == 0)
+			{
+				divColorsPredefined.appendChild(d.createElement("br"));
+			}
+
+			var colorName = this.colors[i];
+			var buttonColor = d.createElement("button");
+			buttonColor.innerHTML = "&nbsp;&nbsp;";
+			buttonColor.style.backgroundColor = colorName;
+			buttonColor.onclick = this.buttonColor_Clicked.bind(this);
+			divColorsPredefined.appendChild(buttonColor);
+		} 
+	}
+ 
 	// ui events
 
 	buttonClear_Clicked()
@@ -205,6 +262,16 @@ class Session
 		this.drawTileSelectedToTileset();
 	}
  
+	buttonColorSelectedAddToPalette_Clicked()
+	{
+		var wasColorAddSuccessful =
+			this.colorAddToPalette(this.colorSelected);
+		if (wasColorAddSuccessful == false)
+		{
+			alert("Color already in palette.");
+		}
+	}
+
 	buttonFlood_Clicked()
 	{
 		this.displayTileSelectedActualSize.fillWithColor(this.colorSelected);
@@ -231,6 +298,34 @@ class Session
 		var alpha = inputColorAlpha.value;
 		var colorFromRGBA = "rgba(" + red + "," + green + "," + blue + "," + alpha + ")";
 		this.colorSelect(colorFromRGBA);
+	}
+
+	buttonPaletteClear_Clicked()
+	{
+		this.colorPaletteClear();
+	}
+
+	buttonPaletteExtract_Clicked()
+	{
+		var display = this.displayImageTileset;
+		var size = display.sizeInPixels;
+		var pixelPos = new Coords(0, 0);
+		for (var y = 0; y < size.y; y++)
+		{
+			pixelPos.y = y;
+
+			for (var x = 0; x < size.x; x++)
+			{
+				pixelPos.x = x;
+				var pixelColor = display.colorAtPos(pixelPos);
+				this.colorAddToPalette(pixelColor);
+			}
+		}
+	}
+
+	buttonPaletteReset_Clicked()
+	{
+		this.colorPaletteReset();
 	}
 
 	buttonSizeChange_Clicked(event)
@@ -264,7 +359,7 @@ class Session
 			this.imageTilesetSizeInTiles
 		);
 
-		this.initialize();
+		this.initializeForImageTileset();
 
 		var session = this;
 
@@ -311,6 +406,8 @@ class Session
 		{
 			return;
 		}
+
+		this.initializeForTileSelected();
  
 		var canvas = event.target;
 		var canvasBounds = canvas.getBoundingClientRect();
@@ -386,6 +483,12 @@ class Session
 
 			this.drawMagnified();
 		}
+		else if (this.isExtractingColor)
+		{
+			var colorToSelect =
+				this.displayTileSelectedActualSize.colorAtPos(clickPosInCells);
+			this.colorSelect(colorToSelect);
+		}
 		else
 		{
 			var color = this.colorSelected; 
@@ -405,13 +508,16 @@ class Session
 
 			this.displayTileSelectedMagnified.drawRectangle
 			(
-				color,
-				cellPosInPixels,
-				this.cellSizeInPixels
+				color, cellPosInPixels, this.cellSizeInPixels
 			);
 		}
 
 		this.drawTileSelectedToTileset();
+	}
+
+	checkboxColorExtract_Changed(checkboxColorExtract)
+	{
+		this.isExtractingColor = checkboxColorExtract.checked;
 	}
 
 	checkboxErase_Changed(checkboxErase)
@@ -427,25 +533,41 @@ class Session
 			if (fileToLoad.type.match("image.*") != null)
 			{
 				var fileReader = new FileReader();
-				fileReader.onload = this.inputFileToLoad_Changed_Loaded.bind(this); 
+				fileReader.onload =
+					this.inputFileToLoad_Changed_FileLoaded.bind(this); 
 				fileReader.readAsDataURL(fileToLoad);
 			}
 		}
 	}
  
-	inputFileToLoad_Changed_Loaded(fileLoadedEvent) 
+	inputFileToLoad_Changed_FileLoaded(fileLoadedEvent) 
 	{
 		var imageLoaded = document.createElement("img");
+		imageLoaded.onload =
+			this.inputFileToLoad_Changed_FileLoaded_ImgLoaded.bind(this);
 		imageLoaded.src = fileLoadedEvent.target.result;
+	}
+
+	inputFileToLoad_Changed_FileLoaded_ImgLoaded(imgLoadedEvent)
+	{
+		var imageLoaded = imgLoadedEvent.target;
+
+		this.imageTilesetSizeInPixels.x = imageLoaded.width;
+		this.imageTilesetSizeInPixels.y = imageLoaded.height;
+
+		this.tileSizeInPixelsActual.x = 16;
+		this.tileSizeInPixelsActual.y = 16;
  
-		this.tileSizeInPixelsActual.x = imageLoaded.width;
-		this.tileSizeInPixelsActual.y = imageLoaded.height;
+		this.imageTilesetSizeInTiles.overwriteWith
+		(
+			this.imageTilesetSizeInPixels
+		).divide
+		(
+			this.tileSizeInPixelsActual
+		);
  
-		this.initialize();
+		this.initializeForImageTileset();
  
 		this.displayImageTileset.drawImage(imageLoaded);
-
-		//this.displayActualSize.drawImage(imageLoaded);
-		//this.displayMagnified.drawImageStretched(imageLoaded);
 	} 
 }

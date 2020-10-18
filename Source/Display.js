@@ -26,6 +26,14 @@ class Display
 		);
 	}
 
+	colorAtPos(pixelPos)
+	{
+		var componentsRGBA =
+			this.graphics.getImageData(pixelPos.x, pixelPos.y, 1, 1).data;
+		var color = "rgba(" + componentsRGBA.join(",") + ")";
+		return color
+	}
+
 	drawImage(image, pos)
 	{
 		pos = pos || new Coords(0, 0);
@@ -101,5 +109,10 @@ class Display
 
 		this.graphics = this.canvas.getContext("2d");
 		this.graphics.imageSmoothingEnabled = false;
+ 	}
+
+ 	toRGBATuples()
+ 	{
+		return this.canvas.getImageData(0, 0, this.sizeInPixels.x, this.sizeInPixels.y);
  	}
 }
