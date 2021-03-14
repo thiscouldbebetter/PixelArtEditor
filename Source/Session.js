@@ -158,8 +158,7 @@ class Session
 
 		this.displayImageTileset.clearRectangle
 		(
-			tilePosInPixels.x, tilePosInPixels.y,
-			this.tileSizeInPixelsActual.x, this.tileSizeInPixelsActual.y
+			tilePosInPixels, this.tileSizeInPixelsActual
 		);
 
 		this.displayImageTileset.drawImage
@@ -282,7 +281,7 @@ class Session
 	buttonColor_Clicked(event)
 	{
 		var buttonColor = event.target;
-		this.colorSelect(buttonColor.innerHTML);
+		this.colorSelect(buttonColor.style.backgroundColor);
 	}
 
 	buttonColorFromRGB_Clicked(event)
