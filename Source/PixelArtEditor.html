@@ -56,32 +56,39 @@
 	<label>Tile Image:</label>
 	<div id="divTileSelected">[none]</div>
 
-	<div>
-		<button onclick="Session.Instance().buttonClear_Clicked();">Clear</button>
+	<div id="divTools">
+		<label>Tool:</label>
+		<select onchange="Session.Instance().selectTool_Changed(this);">
+			<option selected="true">Paint Pixel</option>
+			<option>Erase</option>
+			<option>Extract Color</option>
+			<option>Flood Fill</option>
+			<option>ERASE ENTIRE TILE</option>
+			<option>PAINT ENTIRE TILE</option>
+		</select>
 	</div>
 
 	<div id="divColors">
+
 		<label>Color Selected:</label>
 		<button id="buttonColorSwatch" style="background-color:Black">&nbsp;</button>
-		<button onclick="Session.Instance().buttonFlood_Clicked();">Flood</button>
-		<label>Erase:</label>
-		<input id="checkboxErase" type="checkbox" onchange="Session.Instance().checkboxErase_Changed(this)";></input>
-		<label>Extract Color:</label>
-		<input id="checkboxColorExtract" type="checkbox" onchange="Session.Instance().checkboxColorExtract_Changed(this)";></input>
-		<div>
-			<button onclick="Session.Instance().buttonColorSelectedAddToPalette_Clicked();">Add to Palette</button>
-		</div>
+
+		<button onclick="Session.Instance().buttonColorSelectedAddToPalette_Clicked();">Add to Palette</button>
 
 		<div>
 			<button onclick="Session.Instance().buttonColorFromRGB_Clicked();">Set From:</button>
 			<label>Red:</label>
-			<input id="inputColorRed" type="number" value="128" style="width:64px"></input>
+			<input id="inputColorRed" type="number" value="128" style="width:48px"></input>
+			<label>/255</label>
 			<label>Green:</label>
-			<input id="inputColorGreen" type="number" value="128" style="width:64px"></input>
+			<input id="inputColorGreen" type="number" value="128" style="width:48px"></input>
+			<label>/255</label>
 			<label>Blue:</label>
-			<input id="inputColorBlue" type="number" value="128" style="width:64px"></input>
+			<input id="inputColorBlue" type="number" value="128" style="width:48px"></input>
+			<label>/255</label>
 			<label>Opacity:</label>
-			<input id="inputColorAlpha" type="number" value=".5" style="width:64px"></input>
+			<input id="inputColorAlpha" type="number" value=".5" style="width:48px"></input>
+			<label>/1</label>
 		</div>
 
 		<div>
@@ -95,6 +102,7 @@
 
 </div>
 
+<script type="text/javascript" src="Color.js"></script>
 <script type="text/javascript" src="Coords.js"></script>
 <script type="text/javascript" src="Display.js"></script>
 <script type="text/javascript" src="Session.js"></script>

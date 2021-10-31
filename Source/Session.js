@@ -18,8 +18,8 @@ class Session
 
 		this.imageTilesetSizeInPixels =
 			this.imageTilesetSizeInTiles.clone().multiply(this.tileSizeInPixelsActual);
-		this.isErasing = false;
-		this.isExtractingColor = false;
+
+		this.toolSelectedName = "Paint Pixel";
 	}
 
 	static Instance()
@@ -32,39 +32,10 @@ class Session
 				new Coords(16, 16), // tileSizeInPixelsActual
 				new Coords(0, 0), // tileSelectedPosInTiles
 				16, // magnificationFactor
-				Session.colorsDefault()
+				Color.Instances()._All
 			);
 		}
 		return Session._instance;
-	}
-
-	static colorsDefault()
-	{
-		var returnValues =
-		[
-			"Black",
-			"Gray", 
-			"White",
-			"Red",
-			"Orange",
-			"Yellow",
-			"Green",
-			"Blue",
-			"Purple",
-
-			"Brown",
-			"Cyan",
-			"DarkGray",
-			"LightGray",
-			"LightGreen",
-			"LightBlue",
-			"Gold",
-			"Pink",
-			"Salmon",
-			"Violet",
-			"Tan",
-		];
-		return returnValues;
 	}
 
 	// Instance methods.
@@ -76,7 +47,8 @@ class Session
 		var d = document;
 
 		var buttonColorSwatch = d.getElementById("buttonColorSwatch");
-		buttonColorSwatch.style.backgroundColor = this.colorSelected;
+		buttonColorSwatch.style.backgroundColor =
+			this.colorSelected.systemColor;
 
 		var inputColorRed = d.getElementById("inputColorRed");
 		var inputColorGreen = d.getElementById("inputColorGreen");
@@ -87,7 +59,7 @@ class Session
 		canvas.width = 1;
 		canvas.height = 1;
 		var g = canvas.getContext("2d");
-		g.fillStyle = this.colorSelected;
+		g.fillStyle = this.colorSelected.systemColor;
 		g.fillRect(0, 0, 1, 1);
 		var colorComponentsRGBA = g.getImageData(0, 0, 1, 1).data;
 
@@ -99,9 +71,8 @@ class Session
 
 	colorAddToPalette(colorToAdd)
 	{
-		var isColorNotInPalette =
-			(this.colors.indexOf(colorToAdd) == -1);
-		if (isColorNotInPalette)
+		var isColorInPalette = this.colors.some(x => x.equals(colorToAdd));
+		if (isColorNotInPalette == false)
 		{
 			this.colors.push(colorToAdd);
 			this.initializePalette();
@@ -140,8 +111,7 @@ class Session
 				pixelPos.x = x;
 				var pixelColorAsRGBA =
 					this.displayTileSelectedActualSize.getPixelAtPosAsRGBA(pixelPos);
-				var pixelColor =
-					"rgba(" + pixelColorAsRGBA.join(",") + ")";
+				var pixelColor = new Color(pixelColorAsRGBA);
 				drawPos.overwriteWith(pixelPos).multiplyScalar(this.magnificationFactor);
 				this.displayTileSelectedMagnified.drawRectangle
 				(
@@ -243,23 +213,17 @@ class Session
 				divColorsPredefined.appendChild(d.createElement("br"));
 			}
 
-			var colorName = this.colors[i];
+			var color = this.colors[i];
 			var buttonColor = d.createElement("button");
+			buttonColor.color = color; 
 			buttonColor.innerHTML = "&nbsp;&nbsp;";
-			buttonColor.style.backgroundColor = colorName;
+			buttonColor.style.backgroundColor = color.systemColor;
 			buttonColor.onclick = this.buttonColor_Clicked.bind(this);
 			divColorsPredefined.appendChild(buttonColor);
 		} 
 	}
  
 	// ui events
-
-	buttonClear_Clicked()
-	{
-		this.displayTileSelectedActualSize.clear();
-		this.displayTileSelectedMagnified.clear();
-		this.drawTileSelectedToTileset();
-	}
  
 	buttonColorSelectedAddToPalette_Clicked()
 	{
@@ -267,21 +231,14 @@ class Session
 			this.colorAddToPalette(this.colorSelected);
 		if (wasColorAddSuccessful == false)
 		{
-			alert("Color already in palette.");
+			alert("The selected color is already in the palette.");
 		}
-	}
+	} 
 
-	buttonFlood_Clicked()
-	{
-		this.displayTileSelectedActualSize.fillWithColor(this.colorSelected);
-		this.drawMagnified();
-		this.drawTileSelectedToTileset();
-	}
- 
 	buttonColor_Clicked(event)
 	{
 		var buttonColor = event.target;
-		this.colorSelect(buttonColor.style.backgroundColor);
+		this.colorSelect(buttonColor.color);
 	}
 
 	buttonColorFromRGB_Clicked(event)
@@ -476,19 +433,38 @@ class Session
 			this.cellSizeInPixels
 		).floor();
  
-		if (this.isErasing)
+		if (this.toolSelectedName == "Erase")
 		{
 			this.displayTileSelectedActualSize.clearPixel(clickPosInCells);
 
 			this.drawMagnified();
 		}
-		else if (this.isExtractingColor)
+		else if (this.toolSelectedName == "ERASE ENTIRE TILE")
+		{
+			this.displayTileSelectedActualSize.clear();
+			this.displayTileSelectedMagnified.clear();
+			this.drawTileSelectedToTileset();
+		}
+		else if (this.toolSelectedName == "Extract Color")
 		{
 			var colorToSelect =
 				this.displayTileSelectedActualSize.colorAtPos(clickPosInCells);
 			this.colorSelect(colorToSelect);
 		}
-		else
+		else if (this.toolSelectedName == "Flood Fill")
+		{
+			this.floodFillWithColorStartingAtPos
+			(
+				this.colorSelected, clickPosInCells
+			);
+			this.drawMagnified();
+		}
+		else if (this.toolSelectedName == "PAINT ENTIRE TILE")
+		{
+			this.displayTileSelectedActualSize.fillWithColor(this.colorSelected);
+			this.drawMagnified();
+		}
+		else if (this.toolSelectedName == "Paint Pixel")
 		{
 			var color = this.colorSelected; 
 
@@ -510,20 +486,95 @@ class Session
 				color, cellPosInPixels, this.cellSizeInPixels
 			);
 		}
+		else
+		{
+			throw new Error("Unrecognized tool name: " + this.toolSelectedName);
+		}
 
 		this.drawTileSelectedToTileset();
 	}
-
-	checkboxColorExtract_Changed(checkboxColorExtract)
-	{
-		this.isExtractingColor = checkboxColorExtract.checked;
-	}
-
-	checkboxErase_Changed(checkboxErase)
-	{
-		this.isErasing = checkboxErase.checked;
-	}
  
+	floodFillWithColorStartingAtPos(colorToFillWith, pixelPosToStartAt)
+	{
+		var colorDifferenceTolerance = 0; 
+		var display = this.displayTileSelectedActualSize;
+
+		var imageSize = display.sizeInPixels;
+		var imageSizeMinusOnes =
+			imageSize.clone().subtract(new Coords(1, 1));
+ 
+		var colorToFillOverRGBA =
+			display.colorAtPos(pixelPosToStartAt).componentsRGBA;
+ 
+		var pixelPos = pixelPosToStartAt.clone();
+		var pixelIndexStart = pixelPos.y * imageSize.x + pixelPos.x;
+		var pixelIndicesToTest = [ pixelIndexStart ];
+		var pixelIndicesAlreadyTested = [];
+ 
+		var neighborOffsets =
+		[
+			new Coords(-1, 0),
+			new Coords(1, 0),
+			new Coords(0, -1),
+			new Coords(0, 1)
+		];
+ 
+		while (pixelIndicesToTest.length > 0)
+		{
+			var pixelIndex = pixelIndicesToTest[0];
+			pixelIndicesToTest.splice(0, 1);
+			pixelIndicesAlreadyTested[pixelIndex] = pixelIndex;
+
+			pixelPos.x = pixelIndex % imageSize.x;
+			pixelPos.y = Math.floor(pixelIndex / imageSize.x);
+
+			var pixelColor = display.colorAtPos(pixelPos);
+			var pixelRGBA = pixelColor.componentsRGBA;
+			var pixelDifference = Math.abs
+			(
+				pixelRGBA[0] - colorToFillOverRGBA[0]
+				+ pixelRGBA[1] - colorToFillOverRGBA[1]
+				+ pixelRGBA[2] - colorToFillOverRGBA[2]
+				+ (pixelRGBA[3] - colorToFillOverRGBA[3]) * 255
+			);
+
+			if (pixelDifference <= colorDifferenceTolerance)
+			{
+				display.drawPixel(colorToFillWith, pixelPos);
+
+				var neighborPos = new Coords();
+
+				for (var n = 0; n < neighborOffsets.length; n++)
+				{
+					var neighborOffset = neighborOffsets[n];
+
+					neighborPos.overwriteWith
+					(
+						pixelPos
+					).add
+					(
+						neighborOffset
+					);
+ 
+					if (neighborPos.isInRange(imageSize))
+					{
+						var neighborIndex =
+							neighborPos.y * imageSize.x + neighborPos.x;
+						var isPixelIndexAlreadyUnderConsideration =
+						(
+							pixelIndicesToTest.indexOf(neighborIndex) >= 0
+							|| pixelIndicesAlreadyTested[neighborIndex] != null
+						)
+						if (isPixelIndexAlreadyUnderConsideration == false)
+						{
+							pixelIndicesToTest.push(neighborIndex);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	inputFileToLoad_Changed(inputFileToLoad)
 	{
 		var fileToLoad = inputFileToLoad.files[0];
@@ -568,5 +619,10 @@ class Session
 		this.initializeForImageTileset();
  
 		this.displayImageTileset.drawImage(imageLoaded);
-	} 
+	}
+
+	selectTool_Changed(selectTool)
+	{
+		this.toolSelectedName = selectTool.value;
+	}
 }

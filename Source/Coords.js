@@ -7,6 +7,13 @@ class Coords
 		this.y = y;
 	}
 
+	add(other)
+	{
+		this.x += other.x;
+		this.y += other.y;
+		return this;
+	}
+
 	clone()
 	{
 		return new Coords(this.x, this.y);
@@ -26,6 +33,19 @@ class Coords
 		return this;
 	}
  
+	isInRange(rangeMax)
+	{
+		var isInRange =
+		(
+			this.x >= 0
+			&& this.x <= rangeMax.x
+			&& this.y >= 0
+			&& this.y <= rangeMax.y
+		);
+
+		return isInRange;
+	}
+
 	multiply(other)
 	{
 		this.x *= other.x;
@@ -44,6 +64,13 @@ class Coords
 	{
 		this.x = other.x;
 		this.y = other.y;
+		return this;
+	}
+
+	subtract(other)
+	{
+		this.x -= other.x;
+		this.y -= other.y;
 		return this;
 	}
 }

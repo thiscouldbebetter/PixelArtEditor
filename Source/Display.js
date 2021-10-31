@@ -30,8 +30,8 @@ class Display
 	{
 		var componentsRGBA =
 			this.graphics.getImageData(pixelPos.x, pixelPos.y, 1, 1).data;
-		var color = "rgba(" + componentsRGBA.join(",") + ")";
-		return color
+		var color = new Color(componentsRGBA);
+		return color;
 	}
 
 	drawImage(image, pos)
@@ -67,7 +67,7 @@ class Display
  
 	drawPixel(color, pos)
 	{
-		this.graphics.fillStyle = color;
+		this.graphics.fillStyle = color.systemColor;
 		this.graphics.fillRect
 		(
 			pos.x, pos.y, 1, 1
@@ -76,7 +76,7 @@ class Display
  
 	drawRectangle(color, pos, size)
 	{
-		this.graphics.fillStyle = color;
+		this.graphics.fillStyle = color.systemColor;
 		this.graphics.fillRect
 		(
 			pos.x, pos.y, size.x, size.y
