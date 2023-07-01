@@ -55,6 +55,13 @@
 
 		<label>Magnification Factor:</label>
 		<input id="inputMagnificationFactor" type="number" style="width:64px" value="16"></input>
+		<br />
+
+		<label>Shift Pixels:</label>
+		<button onclick="Session.Instance().buttonShiftPixelsLeft_Clicked();">Left</button>
+		<button onclick="Session.Instance().buttonShiftPixelsUp_Clicked();">Up</button>
+		<button onclick="Session.Instance().buttonShiftPixelsDown_Clicked();">Down</button>
+		<button onclick="Session.Instance().buttonShiftPixelsRight_Clicked();">Right</button>
 
 	</div>
 
@@ -63,7 +70,7 @@
 
 	<div id="divTools">
 		<label>Tool:</label>
-		<select onchange="Session.Instance().selectTool_Changed(this);">
+		<select id="selectTool" onchange="Session.Instance().selectTool_Changed(this);">
 			<option selected="true">Paint Pixel</option>
 			<option>Erase</option>
 			<option>Extract Color</option>

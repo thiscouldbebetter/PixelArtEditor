@@ -32,7 +32,7 @@ class Session
 				new Coords(16, 16), // tileSizeInPixelsActual
 				new Coords(0, 0), // tileSelectedPosInTiles
 				16, // magnificationFactor
-				Color.Instances()._All
+				Color.Instances().paletteDefault()
 			);
 		}
 		return Session._instance;
@@ -140,6 +140,7 @@ class Session
 	initialize()
 	{
 		this.initializeForImageTileset();
+		this.initializeKeyboardShortcuts();
 		this.initializePalette();
 		this.colorSelect(this.colors[0]);
 	}
@@ -195,6 +196,11 @@ class Session
 
 		this.displayTileSelectedActualSize = new Display(this.tileSizeInPixelsActual);
 		this.displayTileSelectedActualSize.initialize(divTileSelected);
+	}
+
+	initializeKeyboardShortcuts()
+	{
+		document.body.onkeydown = this.body_KeyDown;
 	}
 
 	initializePalette()
@@ -286,10 +292,43 @@ class Session
 			}
 			imageActualSize.src = imageActualSizeAsUrl;
 		}
-	} 
- 
+	}
+
+	shiftPixelsInDirection(directionToShift)
+	{
+		var display = this.displayTileSelectedActualSize;
+
+		var canvasSaved = display.toCanvas();
+
+		display.clear();
+		display.drawImage(canvasSaved, directionToShift);
+
+		this.drawTileSelectedToTileset();
+		this.drawMagnified();
+	}
+
 	// ui events
- 
+
+	body_KeyDown(event)
+	{
+		var key = event.key;
+		var keyAsInteger = parseInt(key);
+		if (isNaN(keyAsInteger) == false)
+		{
+			keyAsInteger--;
+
+			var d = document;
+			var selectTool = d.getElementById("selectTool");
+			var tools = selectTool.options;
+			if (keyAsInteger < tools.length)
+			{
+				var toolToSelect = tools[keyAsInteger];
+				selectTool.value = toolToSelect.value;
+				this.toolSelectedName = toolToSelect;
+			}
+		}
+	}
+
 	buttonColorSelectedAddToPalette_Clicked()
 	{
 		var wasColorAddSuccessful =
@@ -405,6 +444,26 @@ class Session
 		link.href = window.URL.createObjectURL(imageAsBlob);
 		link.download = "Image.png";
 		link.click();
+	}
+
+	buttonShiftPixelsDown_Clicked()
+	{
+		this.shiftPixelsInDirection(new Coords(0, 1) );
+	}
+
+	buttonShiftPixelsLeft_Clicked()
+	{
+		this.shiftPixelsInDirection(new Coords(-1, 0) );
+	}
+
+	buttonShiftPixelsRight_Clicked()
+	{
+		this.shiftPixelsInDirection(new Coords(1, 0) );
+	}
+
+	buttonShiftPixelsUp_Clicked()
+	{
+		this.shiftPixelsInDirection(new Coords(0, -1) );
 	}
 
 	canvasImageTileset_MouseDown(event)

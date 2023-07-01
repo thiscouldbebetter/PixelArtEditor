@@ -92,4 +92,43 @@ class Color_Instances
 	{
 		return this[name];
 	}
+
+	paletteDefault()
+	{
+		var colors = [];
+
+		var rowMultipliersRgb =
+		[
+			[1, 1, 1], // gray
+			[1, 0, 0], // red
+			[1, .5, 0], // orange
+			[1, 1, 0], // yellow,
+			[0, 1, 0], // green
+			[0, 1, 1], // cyan
+			[0, 0, 1], // blue
+			[1, 0, 1], // violet
+		];
+
+		var shadesPerRow = 16;
+		var componentMax = 255;
+
+		for (var r = 0; r < rowMultipliersRgb.length; r++)
+		{
+			var rowMultiplierRgb = rowMultipliersRgb[r];
+			for (var i = 0; i < shadesPerRow; i++)
+			{
+				var componentStep = i * componentMax / (shadesPerRow - 1);
+
+				var red = Math.round(componentStep * rowMultiplierRgb[0]);
+				var green = Math.round(componentStep * rowMultiplierRgb[1]);
+				var blue = Math.round(componentStep * rowMultiplierRgb[2]);
+
+				var colorComponentsRgba = [red, green, blue, 1];
+				var color = new Color(colorComponentsRgba);
+				colors.push(color);
+			}
+		}
+
+		return colors;
+	}
 }

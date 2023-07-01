@@ -110,6 +110,17 @@ class Display
 		this.graphics = this.canvas.getContext("2d");
 		this.graphics.imageSmoothingEnabled = false;
  	}
+ 
+	toCanvas()
+	{
+		var d = document;
+		var canvas = d.createElement("canvas");
+		canvas.width = this.sizeInPixels.x;
+		canvas.height = this.sizeInPixels.y;
+		var graphics = canvas.getContext("2d");
+		graphics.drawImage(this.canvas, 0, 0);
+		return canvas;
+	}
 
  	toRGBATuples()
  	{
