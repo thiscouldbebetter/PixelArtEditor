@@ -57,17 +57,6 @@
 		<input id="inputMagnificationFactor" type="number" style="width:64px" value="16"></input>
 		<br />
 
-		<label>Shift Pixels:</label>
-		<button onclick="Session.Instance().buttonShiftPixelsLeft_Clicked();">Left</button>
-		<button onclick="Session.Instance().buttonShiftPixelsUp_Clicked();">Up</button>
-		<button onclick="Session.Instance().buttonShiftPixelsDown_Clicked();">Down</button>
-		<button onclick="Session.Instance().buttonShiftPixelsRight_Clicked();">Right</button>
-
-		<label>Flip:</label>
-		<button onclick="Session.Instance().buttonFlipHorizontal_Clicked();">Horizontal</button>
-		<button onclick="Session.Instance().buttonFlipVertical_Clicked();">Vertical</button>
-		<button onclick="Session.Instance().buttonRotateRight_Clicked();">Rotate Right</button>
-
 	</div>
 
 	<label>Tile Image:</label>
@@ -83,6 +72,30 @@
 			<option>ERASE ENTIRE TILE</option>
 			<option>PAINT ENTIRE TILE</option>
 		</select>
+	</div>
+
+	<div>
+		<label>Shift Pixels:</label>
+		<button onclick="Session.Instance().buttonShiftPixelsLeft_Clicked();">Left</button>
+		<button onclick="Session.Instance().buttonShiftPixelsUp_Clicked();">Up</button>
+		<button onclick="Session.Instance().buttonShiftPixelsDown_Clicked();">Down</button>
+		<button onclick="Session.Instance().buttonShiftPixelsRight_Clicked();">Right</button>
+
+		<label>Flip:</label>
+		<button onclick="Session.Instance().buttonFlipHorizontal_Clicked();">Horizontal</button>
+		<button onclick="Session.Instance().buttonFlipVertical_Clicked();">Vertical</button>
+		<button onclick="Session.Instance().buttonRotateRight_Clicked();">Rotate Right</button>
+	</div>
+
+	<div>
+		<button onclick="Session.Instance().buttonUndo_Clicked();">Undo Last Operation</button>
+		<button
+			id="buttonUndoClearSnapshots"
+			onclick="Session.Instance().buttonUndoClearSnapshots_Clicked();"
+		>
+			Clear Snapshots: 0
+		</button>
+
 	</div>
 
 	<div id="divColors">

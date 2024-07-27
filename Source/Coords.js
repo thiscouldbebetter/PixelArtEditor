@@ -7,6 +7,11 @@ class Coords
 		this.y = y;
 	}
 
+	static zeroes()
+	{
+		return new Coords(0, 0);
+	}
+
 	add(other)
 	{
 		this.x += other.x;
