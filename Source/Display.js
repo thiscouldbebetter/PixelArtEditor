@@ -45,7 +45,7 @@ class Display
 
 	drawImage(image, pos)
 	{
-		pos = pos || new Coords(0, 0);
+		pos = pos || Coords.zeroes();
 		this.graphics.drawImage
 		(
 			image, pos.x, pos.y

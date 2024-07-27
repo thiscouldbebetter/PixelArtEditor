@@ -22,6 +22,7 @@ class Session
 		this.toolSelectedName = "Paint Pixel";
 
 		this.canvasesForSnapshots = [];
+		this.canvasSaved = null;
 	}
 
 	static Instance()
@@ -103,11 +104,13 @@ class Session
 	{
 		this.displayTileSelectedMagnified.clear();
 
-		var imageSizeActual = this.displayTileSelectedActualSize.sizeInPixels;
+		var imageSizeActual =
+			this.displayTileSelectedActualSize.sizeInPixels;
 
-		var pixelPos = new Coords();
-		var drawPos = new Coords();
-		var drawSize = new Coords(1, 1).multiplyScalar(this.magnificationFactor);
+		var pixelPos = Coords.zeroes();
+		var drawPos = Coords.zeroes();
+		var drawSize =
+			new Coords(1, 1).multiplyScalar(this.magnificationFactor);
 
 		for (var y = 0; y < imageSizeActual.y; y++)
 		{
@@ -130,7 +133,9 @@ class Session
 	drawTileSelectedToTileset()
 	{
 		var tilePosInPixels =
-			this.tileSelectedPosInTiles.clone().multiply(this.tileSizeInPixelsActual);
+			this.tileSelectedPosInTiles
+				.clone()
+				.multiply(this.tileSizeInPixelsActual);
 
 		this.displayImageTileset.clearRectangle
 		(
@@ -139,7 +144,8 @@ class Session
 
 		this.displayImageTileset.drawImage
 		(
-			this.displayTileSelectedActualSize.canvas, tilePosInPixels
+			this.displayTileSelectedActualSize.canvas,
+			tilePosInPixels
 		);
 
 		/*
@@ -226,7 +232,8 @@ class Session
 	{ 
 		var d = document;
 
-		var divColorsPredefined = d.getElementById("divColorsPredefined");
+		var divColorsPredefined =
+			d.getElementById("divColorsPredefined");
 		divColorsPredefined.innerHTML = "";
  
 		var colorsPerRow = 16;
@@ -359,10 +366,14 @@ class Session
 		var canvasTileset = this.displayImageTileset.canvas;
 		var imageTilesetAsUrl = canvasTileset.toDataURL("image/png");
 
-		var inputTileSizeInPixelsX = d.getElementById("inputTileSizeInPixelsX");
-		var inputTileSizeInPixelsY = d.getElementById("inputTileSizeInPixelsY");
-		var inputImageSizeInTilesX = d.getElementById("inputImageSizeInTilesX");
-		var inputImageSizeInTilesY = d.getElementById("inputImageSizeInTilesY");
+		var inputTileSizeInPixelsX =
+			d.getElementById("inputTileSizeInPixelsX");
+		var inputTileSizeInPixelsY =
+			d.getElementById("inputTileSizeInPixelsY");
+		var inputImageSizeInTilesX =
+			d.getElementById("inputImageSizeInTilesX");
+		var inputImageSizeInTilesY =
+			d.getElementById("inputImageSizeInTilesY");
 		var inputMagnificationFactor =
 			d.getElementById("inputMagnificationFactor");
 
@@ -528,6 +539,31 @@ class Session
 		(
 			this.cellSizeInPixels, cellPosInPixels, color
 		);
+	}
+
+	// Copy/Paste.
+
+	tileSelectedCopy()
+	{
+		if (this.displayTileSelectedActualSize != null)
+		{
+			this.canvasSaved =
+				this.displayTileSelectedActualSize.toCanvas();
+		}
+	}
+
+	tileSelectedPaste()
+	{
+		if (this.displayTileSelectedActualSize != null)
+		{
+			if (this.canvasSaved != null)
+			{
+				this.displayTileSelectedActualSize
+					.drawImage(this.canvasSaved);
+				this.drawMagnified();
+				this.drawTileSelectedToTileset();
+			}
+		}
 	}
 
 	// Undo.
@@ -745,6 +781,16 @@ class Session
 	buttonShiftPixelsUp_Clicked()
 	{
 		this.shiftPixelsInDirection(new Coords(0, -1) );
+	}
+
+	buttonTileSelectedCopy_Clicked()
+	{
+		this.tileSelectedCopy();
+	}
+
+	buttonTileSelectedPaste_Clicked()
+	{
+		this.tileSelectedPaste();
 	}
 
 	buttonUndo_Clicked()
