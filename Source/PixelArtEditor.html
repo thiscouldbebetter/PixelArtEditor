@@ -16,13 +16,13 @@
 
 		<div id="divFileOperations">
 			<label>Load:</label>
-			<input type="file" onchange="Session.Instance().inputFileToLoad_Changed(this);"></input>
-			<button onclick="Session.Instance().buttonSave_Clicked();">Save</button>
+			<input type="file" onchange="UiEventHandler.Instance().inputFileToLoad_Changed(this);"></input>
+			<button onclick="UiEventHandler.Instance().buttonSave_Clicked();">Save</button>
 		</div>
 
 		<div>
 			<label>Sizes:</label>
-			<button onclick="Session.Instance().buttonSizeChange_Clicked();">Update</button>
+			<button onclick="UiEventHandler.Instance().buttonSizeChange_Clicked();">Update</button>
 			<br />
 
 			<label>Tile Size in Pixels:</label>
@@ -39,8 +39,8 @@
 
 			<div>
 				<label>Resize:</label>
-				<button onclick="Session.Instance().buttonResizeDouble_Clicked();">Double</button>
-				<button onclick="Session.Instance().buttonResizeHalf_Clicked();">Half</button>
+				<button onclick="UiEventHandler.Instance().buttonResizeDouble_Clicked();">Double</button>
+				<button onclick="UiEventHandler.Instance().buttonResizeHalf_Clicked();">Half</button>
 			</div>
 		</div>
 
@@ -64,7 +64,7 @@
 
 	<div id="divTools">
 		<label>Tool:</label>
-		<select id="selectTool" onchange="Session.Instance().selectTool_Changed(this);">
+		<select id="selectTool" onchange="UiEventHandler.Instance().selectTool_Changed(this);">
 			<option selected="true">Paint Pixel</option>
 			<option>Erase</option>
 			<option>Extract Color</option>
@@ -76,28 +76,28 @@
 
 	<div>
 		<label>Tile Selected:</label>
-		<button onclick="Session.Instance().buttonTileSelectedCopy_Clicked();">Copy</button>
-		<button onclick="Session.Instance().buttonTileSelectedPaste_Clicked();">Paste</button>
+		<button onclick="UiEventHandler.Instance().buttonTileSelectedCopy_Clicked();">Copy</button>
+		<button onclick="UiEventHandler.Instance().buttonTileSelectedPaste_Clicked();">Paste</button>
 	</div>
 
 	<div>
 		<label>Shift Pixels:</label>
-		<button onclick="Session.Instance().buttonShiftPixelsLeft_Clicked();">Left</button>
-		<button onclick="Session.Instance().buttonShiftPixelsUp_Clicked();">Up</button>
-		<button onclick="Session.Instance().buttonShiftPixelsDown_Clicked();">Down</button>
-		<button onclick="Session.Instance().buttonShiftPixelsRight_Clicked();">Right</button>
+		<button onclick="UiEventHandler.Instance().buttonShiftPixelsLeft_Clicked();">Left</button>
+		<button onclick="UiEventHandler.Instance().buttonShiftPixelsUp_Clicked();">Up</button>
+		<button onclick="UiEventHandler.Instance().buttonShiftPixelsDown_Clicked();">Down</button>
+		<button onclick="UiEventHandler.Instance().buttonShiftPixelsRight_Clicked();">Right</button>
 
 		<label>Flip:</label>
-		<button onclick="Session.Instance().buttonFlipHorizontal_Clicked();">Horizontal</button>
-		<button onclick="Session.Instance().buttonFlipVertical_Clicked();">Vertical</button>
-		<button onclick="Session.Instance().buttonRotateRight_Clicked();">Rotate Right</button>
+		<button onclick="UiEventHandler.Instance().buttonFlipHorizontal_Clicked();">Horizontal</button>
+		<button onclick="UiEventHandler.Instance().buttonFlipVertical_Clicked();">Vertical</button>
+		<button onclick="UiEventHandler.Instance().buttonRotateRight_Clicked();">Rotate Right</button>
 	</div>
 
 	<div>
-		<button onclick="Session.Instance().buttonUndo_Clicked();">Undo Last Operation</button>
+		<button onclick="UiEventHandler.Instance().buttonUndo_Clicked();">Undo Last Operation</button>
 		<button
 			id="buttonUndoClearSnapshots"
-			onclick="Session.Instance().buttonUndoClearSnapshots_Clicked();"
+			onclick="UiEventHandler.Instance().buttonUndoClearSnapshots_Clicked();"
 		>
 			Clear Snapshots: 0
 		</button>
@@ -109,10 +109,10 @@
 		<label>Color Selected:</label>
 		<button id="buttonColorSwatch" style="background-color:Black">&nbsp;</button>
 
-		<button onclick="Session.Instance().buttonColorSelectedAddToPalette_Clicked();">Add to Palette</button>
+		<button onclick="UiEventHandler.Instance().buttonColorSelectedAddToPalette_Clicked();">Add to Palette</button>
 
 		<div>
-			<button onclick="Session.Instance().buttonColorFromRGB_Clicked();">Set From:</button>
+			<button onclick="UiEventHandler.Instance().buttonColorFromRGB_Clicked();">Set From:</button>
 			<label>Red:</label>
 			<input id="inputColorRed" type="number" value="128" style="width:48px"></input>
 			<label>/255</label>
@@ -129,9 +129,9 @@
 
 		<div>
 			<label>Color Palette:</label>
-			<button onclick="Session.Instance().buttonPaletteExtract_Clicked();">Extract from Image</button>
-			<button onclick="Session.Instance().buttonPaletteReset_Clicked();">Reset</button>
-			<button onclick="Session.Instance().buttonPaletteClear_Clicked();">Clear</button>
+			<button onclick="UiEventHandler.Instance().buttonPaletteExtract_Clicked();">Extract from Image</button>
+			<button onclick="UiEventHandler.Instance().buttonPaletteReset_Clicked();">Reset</button>
+			<button onclick="UiEventHandler.Instance().buttonPaletteClear_Clicked();">Clear</button>
 			<div id="divColorsPredefined"></div>
 		</div>
 	</div>
@@ -142,6 +142,7 @@
 <script type="text/javascript" src="Coords.js"></script>
 <script type="text/javascript" src="Display.js"></script>
 <script type="text/javascript" src="Session.js"></script>
+<script type="text/javascript" src="UiEventHandler.js"></script>
  
 <script type="text/javascript">
   

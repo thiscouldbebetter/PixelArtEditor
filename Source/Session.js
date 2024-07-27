@@ -199,7 +199,11 @@ class Session
 		this.displayImageTileset = new Display(this.imageTilesetSizeInPixels);
 		this.displayImageTileset.initialize(divImageTileset);
 		var canvas = this.displayImageTileset.canvas;
-		canvas.onmousedown = this.canvasImageTileset_MouseDown.bind(this);
+		canvas.onmousedown =
+			(event) =>
+				UiEventHandler
+					.Instance()
+					.canvasImageTileset_MouseDown(event);
 
 		var divTileSelected = d.getElementById("divTileSelected");
 		divTileSelected.innerHTML = "[none]";
@@ -215,9 +219,12 @@ class Session
 		this.displayTileSelectedMagnified = new Display(this.tileSizeInPixelsMagnified);
 		this.displayTileSelectedMagnified.initialize(divTileSelected);
 		var canvas = this.displayTileSelectedMagnified.canvas;
-		canvas.onmousedown = this.canvasMagnified_MouseDown.bind(this);
-		canvas.onmousemove = this.canvasMagnified_MouseMoved.bind(this);
-		canvas.onmouseup = this.canvasMagnified_MouseUp.bind(this);
+		canvas.onmousedown = (event) =>
+			UiEventHandler.Instance().canvasMagnified_MouseDown(event);
+		canvas.onmousemove = (event) =>
+			UiEventHandler.Instance().canvasMagnified_MouseMoved(event);
+		canvas.onmouseup = (event) =>
+			UiEventHandler.Instance().canvasMagnified_MouseUp(event);
 
 		this.displayTileSelectedActualSize = new Display(this.tileSizeInPixelsActual);
 		this.displayTileSelectedActualSize.initialize(divTileSelected);
@@ -242,15 +249,21 @@ class Session
 		{
 			if (i > 0 && i % colorsPerRow == 0)
 			{
-				divColorsPredefined.appendChild(d.createElement("br"));
+				divColorsPredefined
+					.appendChild(d.createElement("br") );
 			}
 
 			var color = this.colors[i];
 			var buttonColor = d.createElement("button");
 			buttonColor.color = color; 
-			buttonColor.innerHTML = "&nbsp;&nbsp;";
+			//buttonColor.innerHTML = "&nbsp;&nbsp;";
 			buttonColor.style.backgroundColor = color.systemColor;
-			buttonColor.onclick = this.buttonColor_Clicked.bind(this);
+			var buttonSize =
+				new Coords(1, 2).multiplyScalar(8);
+			buttonColor.style.width = buttonSize.x + "px";
+			buttonColor.style.height = buttonSize.y + "px";
+			buttonColor.onclick = (event) =>
+				UiEventHandler.Instance().buttonColor_Clicked(event);
 			divColorsPredefined.appendChild(buttonColor);
 		} 
 	}
@@ -576,14 +589,16 @@ class Session
 
 		this.canvasesForSnapshots.splice(0, 0, canvasSnapshot);
 
-		this.buttonUndoClearSnapshotsCountUpdate();
+		UiEventHandler.Instance()
+			.buttonUndoClearSnapshotsCountUpdate();
 	}
 
 	snapshotsForUndoClear()
 	{
 		this.canvasesForSnapshots.length = 0;
 		this.snapshotForUndoSave();
-		this.buttonUndoClearSnapshotsCountUpdate();
+		UiEventHandler.Instance()
+			.buttonUndoClearSnapshotsCountUpdate();
 	}
 
 	undo()
@@ -603,394 +618,5 @@ class Session
 
 			this.buttonUndoClearSnapshotsCountUpdate();
 		}
-	}
-
-	// UI events.
-
-	body_KeyDown(event)
-	{
-		var key = event.key;
-		var keyAsInteger = parseInt(key);
-		if (isNaN(keyAsInteger) == false)
-		{
-			keyAsInteger--;
-
-			var d = document;
-			var selectTool = d.getElementById("selectTool");
-			var tools = selectTool.options;
-			if (keyAsInteger < tools.length)
-			{
-				var toolToSelect = tools[keyAsInteger];
-				selectTool.value = toolToSelect.value;
-				this.toolSelectedName = toolToSelect;
-			}
-		}
-	}
-
-	buttonColorSelectedAddToPalette_Clicked()
-	{
-		var wasColorAddSuccessful =
-			this.colorAddToPalette(this.colorSelected);
-		if (wasColorAddSuccessful == false)
-		{
-			alert("The selected color is already in the palette.");
-		}
-	} 
-
-	buttonColor_Clicked(event)
-	{
-		var buttonColor = event.target;
-		this.colorSelect(buttonColor.color);
-	}
-
-	buttonColorFromRGB_Clicked(event)
-	{
-		var d = document;
-		var inputColorRed = d.getElementById("inputColorRed");
-		var inputColorGreen = d.getElementById("inputColorGreen");
-		var inputColorBlue = d.getElementById("inputColorBlue");
-		var inputColorAlpha = d.getElementById("inputColorAlpha");
-		var red = inputColorRed.value;
-		var green = inputColorGreen.value;
-		var blue = inputColorBlue.value;
-		var alpha = inputColorAlpha.value;
-		var colorFromRGBA = "rgba(" + red + "," + green + "," + blue + "," + alpha + ")";
-		this.colorSelect(colorFromRGBA);
-	}
-
-	buttonFlipHorizontal_Clicked()
-	{
-		this.flipHorizontal();
-	}
-
-	buttonFlipVertical_Clicked()
-	{
-		this.flipVertical();
-	}
-
-	buttonPaletteClear_Clicked()
-	{
-		this.colorPaletteClear();
-	}
-
-	buttonPaletteExtract_Clicked()
-	{
-		var display = this.displayImageTileset;
-		var size = display.sizeInPixels;
-		var pixelPos = Coords.zeroes();
-		for (var y = 0; y < size.y; y++)
-		{
-			pixelPos.y = y;
-
-			for (var x = 0; x < size.x; x++)
-			{
-				pixelPos.x = x;
-				var pixelColor = display.colorAtPos(pixelPos);
-				this.colorAddToPalette(pixelColor);
-			}
-		}
-	}
-
-	buttonPaletteReset_Clicked()
-	{
-		this.colorPaletteReset();
-	}
-
-	buttonResizeDouble_Clicked()
-	{
-		var d = document;
-
-		var inputTileSizeInPixelsX =
-			d.getElementById("inputTileSizeInPixelsX");
-		var inputTileSizeInPixelsY =
-			d.getElementById("inputTileSizeInPixelsY");
-
-		var multiplier = 2;
-
-		inputTileSizeInPixelsX.value *= multiplier;
-		inputTileSizeInPixelsY.value *= multiplier;
-
-		this.resize(multiplier);
-	}
-
-	buttonResizeHalf_Clicked()
-	{
-		var d = document;
-
-		var inputTileSizeInPixelsX =
-			d.getElementById("inputTileSizeInPixelsX");
-		var inputTileSizeInPixelsY =
-			d.getElementById("inputTileSizeInPixelsY");
-
-		var multiplier = .5;
-
-		inputTileSizeInPixelsX.value =
-			Math.ceil(inputTileSizeInPixelsX.value * multiplier);
-		inputTileSizeInPixelsY.value =
-			Math.ceil(inputTileSizeInPixelsY.value * multiplier);
-
-		this.resize(multiplier);
-	}
-
-	buttonRotateRight_Clicked()
-	{
-		this.rotateRight();
-	}
-
-	buttonSizeChange_Clicked()
-	{
-		this.resize(1);
-	}
- 
-	buttonSave_Clicked()
-	{
-		var canvas = this.displayImageTileset.canvas;
- 
-		var imageFromCanvasURL = canvas.toDataURL("image/png");
- 
-		var imageAsByteString = atob(imageFromCanvasURL.split(',')[1]);
-		var imageAsArrayBuffer = new ArrayBuffer(imageAsByteString.length);
-		var imageAsArrayUnsigned = new Uint8Array(imageAsArrayBuffer);
-		for (var i = 0; i < imageAsByteString.length; i++) 
-		{
-			imageAsArrayUnsigned[i] = imageAsByteString.charCodeAt(i);
-		}
-		var imageAsBlob = new Blob([imageAsArrayBuffer], {type:'image/png'});
- 
-		var link = document.createElement("a");
-		link.href = window.URL.createObjectURL(imageAsBlob);
-		link.download = "Image.png";
-		link.click();
-	}
-
-	buttonShiftPixelsDown_Clicked()
-	{
-		this.shiftPixelsInDirection(new Coords(0, 1) );
-	}
-
-	buttonShiftPixelsLeft_Clicked()
-	{
-		this.shiftPixelsInDirection(new Coords(-1, 0) );
-	}
-
-	buttonShiftPixelsRight_Clicked()
-	{
-		this.shiftPixelsInDirection(new Coords(1, 0) );
-	}
-
-	buttonShiftPixelsUp_Clicked()
-	{
-		this.shiftPixelsInDirection(new Coords(0, -1) );
-	}
-
-	buttonTileSelectedCopy_Clicked()
-	{
-		this.tileSelectedCopy();
-	}
-
-	buttonTileSelectedPaste_Clicked()
-	{
-		this.tileSelectedPaste();
-	}
-
-	buttonUndo_Clicked()
-	{
-		this.undo();
-	}
-
-	buttonUndoClearSnapshots_Clicked()
-	{
-		this.snapshotsForUndoClear();
-	}
-
-	buttonUndoClearSnapshotsCountUpdate()
-	{
-		var d = document;
-		var buttonUndoClearSnapshots =
-			d.getElementById("buttonUndoClearSnapshots");
-		var buttonText = buttonUndoClearSnapshots.innerText;
-		var parts = buttonText.split(": ").slice(0, 1);
-		var count = this.canvasesForSnapshots.length - 1;
-		parts.push("" + count);
-		buttonText = parts.join(": ");
-		buttonUndoClearSnapshots.innerText = buttonText;
-	}
-
-	canvasImageTileset_MouseDown(event)
-	{
-		if (event.buttons == 0)
-		{
-			return;
-		}
-
-		this.initializeForTileSelected();
-
-		var canvas = event.target;
-		var canvasBounds = canvas.getBoundingClientRect();
-
-		var clickPosInPixels = new Coords
-		(
-			event.clientX - canvasBounds.left, 
-			event.clientY - canvasBounds.top
-		);
-
-		this.tileSelectedPosInTiles = clickPosInPixels.clone().divide
-		(
-			this.tileSizeInPixelsActual
-		).floor();
-
-		var d = document;
-		var inputTileSelectedPosInTilesX =
-			d.getElementById("inputTileSelectedPosInTilesX");
-		var inputTileSelectedPosInTilesY =
-			d.getElementById("inputTileSelectedPosInTilesY");
-
-		inputTileSelectedPosInTilesX.value =
-			this.tileSelectedPosInTiles.x;
-		inputTileSelectedPosInTilesY.value =
-			this.tileSelectedPosInTiles.y;
-
-		var tileSelectedPosInPixels =
-			this.tileSelectedPosInTiles.clone().multiply(this.tileSizeInPixelsActual);
-
-		this.displayTileSelectedActualSize.clear();
-		this.displayTileSelectedActualSize.drawImagePartial
-		(
-			this.displayImageTileset.canvas,
-			tileSelectedPosInPixels, // posToDrawFrom,
-			this.tileSizeInPixelsActual, // size
-			Coords.zeroes() // posToDrawTo
-		);
-		this.drawMagnified();
-
-		this.snapshotsForUndoClear();
-	}
-
-	canvasMagnified_MouseDown(event)
-	{
-		this.canvasMagnified_MouseDownOrMoved(event);
-	}
- 
-	canvasMagnified_MouseMoved(event)
-	{
-		this.canvasMagnified_MouseDownOrMoved(event);
-	}
-
-	canvasMagnified_MouseUp(event)
-	{
-		this.snapshotForUndoSave();
-	}
-
-	canvasMagnified_MouseDownOrMoved(event)
-	{
-		if (event.buttons == 0)
-		{
-			return;
-		}
- 
-		var canvas = event.target;
-		var canvasBounds = canvas.getBoundingClientRect();
- 
-		var clickPosInPixels = new Coords
-		(
-			event.clientX - canvasBounds.left, 
-			event.clientY - canvasBounds.top
-		);
-
-		var clickPosInCells = clickPosInPixels.clone().divide
-		(
-			this.cellSizeInPixels
-		).floor();
- 
-		if (this.toolSelectedName == "Erase")
-		{
-			this.pixelAtPosClear(clickPosInCells);
-		}
-		else if (this.toolSelectedName == "ERASE ENTIRE TILE")
-		{
-			this.displayTileSelectedActualSize.clear();
-			this.displayTileSelectedMagnified.clear();
-			this.drawTileSelectedToTileset();
-		}
-		else if (this.toolSelectedName == "Extract Color")
-		{
-			var colorToSelect =
-				this.displayTileSelectedActualSize.colorAtPos(clickPosInCells);
-			this.colorSelect(colorToSelect);
-		}
-		else if (this.toolSelectedName == "Flood Fill")
-		{
-			this.floodFillWithColorStartingAtPos
-			(
-				this.colorSelected, clickPosInCells
-			);
-			this.drawMagnified();
-		}
-		else if (this.toolSelectedName == "PAINT ENTIRE TILE")
-		{
-			this.displayTileSelectedActualSize.fillWithColor(this.colorSelected);
-			this.drawMagnified();
-		}
-		else if (this.toolSelectedName == "Paint Pixel")
-		{
-			this.pixelAtPosSetToColor(clickPosInCells, this.colorSelected);
-		}
-		else
-		{
-			throw new Error("Unrecognized tool name: " + this.toolSelectedName);
-		}
-
-		this.drawTileSelectedToTileset();
-	}
-
-	inputFileToLoad_Changed(inputFileToLoad)
-	{
-		var fileToLoad = inputFileToLoad.files[0];
-		if (fileToLoad != null)
-		{
-			if (fileToLoad.type.match("image.*") != null)
-			{
-				var fileReader = new FileReader();
-				fileReader.onload =
-					this.inputFileToLoad_Changed_FileLoaded.bind(this); 
-				fileReader.readAsDataURL(fileToLoad);
-			}
-		}
-	}
- 
-	inputFileToLoad_Changed_FileLoaded(fileLoadedEvent) 
-	{
-		var imageLoaded = document.createElement("img");
-		imageLoaded.onload =
-			this.inputFileToLoad_Changed_FileLoaded_ImgLoaded.bind(this);
-		imageLoaded.src = fileLoadedEvent.target.result;
-	}
-
-	inputFileToLoad_Changed_FileLoaded_ImgLoaded(imgLoadedEvent)
-	{
-		var imageLoaded = imgLoadedEvent.target;
-
-		this.imageTilesetSizeInPixels.x = imageLoaded.width;
-		this.imageTilesetSizeInPixels.y = imageLoaded.height;
-
-		this.tileSizeInPixelsActual.x = 16;
-		this.tileSizeInPixelsActual.y = 16;
- 
-		this.imageTilesetSizeInTiles.overwriteWith
-		(
-			this.imageTilesetSizeInPixels
-		).divide
-		(
-			this.tileSizeInPixelsActual
-		);
- 
-		this.initializeForImageTileset();
- 
-		this.displayImageTileset.drawImage(imageLoaded);
-	}
-
-	selectTool_Changed(selectTool)
-	{
-		this.toolSelectedName = selectTool.value;
 	}
 }
