@@ -21,6 +21,11 @@ class Color
 		return Color.Instances().byName(name)
 	}
 
+	static fromComponentsRgba(componentsRgba)
+	{
+		return new Color(componentsRgba);
+	}
+
 	equals(other)
 	{
 		return (this.systemColor == other.systemColor);

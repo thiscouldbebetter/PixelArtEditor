@@ -110,12 +110,12 @@ class Session
 			{
 				pixelPos.x = x;
 				var pixelColorAsRGBA =
-					this.displayTileSelectedActualSize.getPixelAtPosAsRGBA(pixelPos);
+					this.displayTileSelectedActualSize.pixelAtPosGetAsRGBA(pixelPos);
 				var pixelColor = new Color(pixelColorAsRGBA);
 				drawPos.overwriteWith(pixelPos).multiplyScalar(this.magnificationFactor);
-				this.displayTileSelectedMagnified.drawRectangle
+				this.displayTileSelectedMagnified.drawRectangleOfSizeAtPosWithColorsFillAndBorder
 				(
-					pixelColor, drawPos, drawSize
+					drawSize, drawPos, pixelColor, null
 				);
 			}
 		}
@@ -135,8 +135,86 @@ class Session
 		(
 			this.displayTileSelectedActualSize.canvas, tilePosInPixels
 		);
+
+		/*
+		this.displayImageTileset.clear().drawRectangleOfSizeAtPosWithColorsFillAndBorder
+		(
+			this.tileSizeInPixelsActual,
+			tilePosInPixels,
+			null, // colorFill
+			Color.Instances().Cyan
+		);
+		*/
 	}
- 
+
+	flipOrRotate(pixelPosAfterSetFromBeforeAndSize)
+	{
+		var displayBefore = this.displayTileSelectedActualSize;
+
+		var canvasSaved = displayBefore.toCanvas();
+
+		var displayAfter = displayBefore.clone();
+
+		displayAfter.clear();
+
+		var pixelPosBefore = new Coords();
+		var pixelPosAfter = new Coords();
+
+		var sizeInPixels = this.tileSizeInPixelsActual;
+
+		for (var y = 0; y < sizeInPixels.y; y++)
+		{
+			pixelPosBefore.y = y;
+
+			for (var x = 0; x < sizeInPixels.x; x++)
+			{
+				pixelPosBefore.x = x;
+
+				var pixelColor =
+					displayBefore.pixelAtPosGetAsColor(pixelPosBefore);
+
+				pixelPosAfterSetFromBeforeAndSize
+				(
+					pixelPosAfter, pixelPosBefore, sizeInPixels
+				);
+
+				displayAfter.drawPixel(pixelColor, pixelPosAfter);
+			}
+		}
+
+		var canvasAfter = displayAfter.toCanvas();
+		displayBefore.clear().drawImage(canvasAfter, new Coords(0, 0) );
+
+		this.drawTileSelectedToTileset();
+		this.drawMagnified();
+	}
+
+	flipHorizontal()
+	{
+		var pixelPosAfterSetFromBeforeAndSize =
+			(pixelPosAfter, pixelPosBefore, sizeInPixels) =>
+				pixelPosAfter.overwriteWithXy
+				(
+					sizeInPixels.x - 1 - pixelPosBefore.x,
+					pixelPosBefore.y
+				);
+
+		this.flipOrRotate(pixelPosAfterSetFromBeforeAndSize);
+	}
+
+	flipVertical()
+	{
+		var pixelPosAfterSetFromBeforeAndSize =
+			(pixelPosAfter, pixelPosBefore, sizeInPixels) =>
+				pixelPosAfter.overwriteWithXy
+				(
+					pixelPosBefore.x,
+					sizeInPixels.y - 1 - pixelPosBefore.y
+				);
+
+		this.flipOrRotate(pixelPosAfterSetFromBeforeAndSize);
+	}
+
 	initialize()
 	{
 		this.initializeForImageTileset();
@@ -294,6 +372,19 @@ class Session
 		}
 	}
 
+	rotateRight()
+	{
+		var pixelPosAfterSetFromBeforeAndSize =
+			(pixelPosAfter, pixelPosBefore, sizeInPixels) =>
+				pixelPosAfter.overwriteWithXy
+				(
+					sizeInPixels.y - 1 - pixelPosBefore.y,
+					pixelPosBefore.x
+				);
+
+		this.flipOrRotate(pixelPosAfterSetFromBeforeAndSize);
+	}
+
 	shiftPixelsInDirection(directionToShift)
 	{
 		var display = this.displayTileSelectedActualSize;
@@ -307,7 +398,7 @@ class Session
 		this.drawMagnified();
 	}
 
-	// ui events
+	// UI events.
 
 	body_KeyDown(event)
 	{
@@ -358,6 +449,16 @@ class Session
 		var alpha = inputColorAlpha.value;
 		var colorFromRGBA = "rgba(" + red + "," + green + "," + blue + "," + alpha + ")";
 		this.colorSelect(colorFromRGBA);
+	}
+
+	buttonFlipHorizontal_Clicked()
+	{
+		this.flipHorizontal();
+	}
+
+	buttonFlipVertical_Clicked()
+	{
+		this.flipVertical();
 	}
 
 	buttonPaletteClear_Clicked()
@@ -418,6 +519,11 @@ class Session
 			Math.ceil(inputTileSizeInPixelsY.value * multiplier);
 
 		this.resize(multiplier);
+	}
+
+	buttonRotateRight_Clicked()
+	{
+		this.rotateRight();
 	}
 
 	buttonSizeChange_Clicked()
@@ -591,9 +697,9 @@ class Session
 				this.cellSizeInPixels
 			);
 
-			this.displayTileSelectedMagnified.drawRectangle
+			this.displayTileSelectedMagnified.drawRectangleOfSizeAtPosWithColorsFillAndBorder
 			(
-				color, cellPosInPixels, this.cellSizeInPixels
+				this.cellSizeInPixels, cellPosInPixels, color
 			);
 		}
 		else

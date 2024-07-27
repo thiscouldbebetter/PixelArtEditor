@@ -8,6 +8,7 @@ class Display
 	clear()
 	{
 		this.graphics.clearRect(0, 0, this.sizeInPixels.x, this.sizeInPixels.y);
+		return this;
 	}
 
 	clearPixel(pos)
@@ -24,6 +25,14 @@ class Display
 		(
 			pos.x, pos.y, size.x, size.y
 		);
+	}
+
+	clone()
+	{
+		var returnValue = new Display(this.sizeInPixels.clone() );
+		returnValue.initialize();
+		returnValue.drawImage(this.canvas, new Coords(0, 0) );
+		return returnValue;
 	}
 
 	colorAtPos(pixelPos)
@@ -74,25 +83,41 @@ class Display
 		);
 	}
  
-	drawRectangle(color, pos, size)
+	drawRectangleOfSizeAtPosWithColorsFillAndBorder
+	(
+		size, pos, colorFill, colorBorder
+	)
 	{
-		this.graphics.fillStyle = color.systemColor;
-		this.graphics.fillRect
-		(
-			pos.x, pos.y, size.x, size.y
-		);
+		var g = this.graphics;
+
+		if (colorFill != null)
+		{
+			g.fillStyle = colorFill.systemColor;
+			g.fillRect
+			(
+				pos.x, pos.y, size.x, size.y
+			);
+		}
+
+		if (colorBorder != null)
+		{
+			g.strokeStyle = colorBorder.systemColor;
+			g.strokeRect
+			(
+				pos.x, pos.y, size.x, size.y
+			);
+		}
 	}
  
 	fillWithColor(color)
 	{
-		this.drawRectangle(color, new Coords(0, 0), this.sizeInPixels);
-	}
-
-	getPixelAtPosAsRGBA(pixelPos)
-	{
-		var imageData = this.graphics.getImageData(pixelPos.x, pixelPos.y, 1, 1);
-		var componentsRGBA = imageData.data;
-		return componentsRGBA;
+		this.drawRectangleOfSizeAtPosWithColorsFillAndBorder
+		(
+			this.sizeInPixels,
+			new Coords(0, 0),
+			color,
+			null
+		);
 	}
  
 	initialize(domElementParent)
@@ -105,11 +130,27 @@ class Display
 
 		this.canvas.style.background = "url('./GrayCheckerboard.png')";
  
-		domElementParent.appendChild(this.canvas);
+		if (domElementParent != null)
+		{
+			domElementParent.appendChild(this.canvas);
+		}
 
 		this.graphics = this.canvas.getContext("2d");
 		this.graphics.imageSmoothingEnabled = false;
  	}
+
+	pixelAtPosGetAsColor(pixelPos)
+	{
+		var rgba = this.pixelAtPosGetAsRGBA(pixelPos);
+		return Color.fromComponentsRgba(rgba);
+	}
+
+	pixelAtPosGetAsRGBA(pixelPos)
+	{
+		var imageData = this.graphics.getImageData(pixelPos.x, pixelPos.y, 1, 1);
+		var componentsRGBA = imageData.data;
+		return componentsRGBA;
+	}
  
 	toCanvas()
 	{

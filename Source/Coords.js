@@ -67,6 +67,13 @@ class Coords
 		return this;
 	}
 
+	overwriteWithXy(x, y)
+	{
+		this.x = x;
+		this.y = y;
+		return this;
+	}
+
 	subtract(other)
 	{
 		this.x -= other.x;
