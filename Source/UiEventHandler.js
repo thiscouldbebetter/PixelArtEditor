@@ -203,6 +203,35 @@ class UiEventHandler
 		Session.Instance().tileSelectedPaste();
 	}
 
+	buttonToolSelect_Clicked(toolName)
+	{
+		var session = Session.Instance();
+		session.toolSelectedNameSet(toolName);
+		var d = document;
+		var selectTool = d.getElementById("selectTool");
+		selectTool.value = toolName;
+	}
+
+	buttonToolSelectPaintPixel_Clicked()
+	{
+		this.buttonToolSelect_Clicked("Paint Pixel");
+	}
+
+	buttonToolSelectErase_Clicked()
+	{
+		this.buttonToolSelect_Clicked("Erase");
+	}
+
+	buttonToolSelectExtractColor_Clicked()
+	{
+		this.buttonToolSelect_Clicked("Extract Color");
+	}
+
+	buttonToolSelectFloodFill_Clicked()
+	{
+		this.buttonToolSelect_Clicked("Flood Fill");
+	}
+
 	buttonUndo_Clicked()
 	{
 		Session.Instance().undo();
@@ -384,7 +413,7 @@ class UiEventHandler
 			}
 		}
 	}
- 
+
 	inputFileToLoad_Changed_FileLoaded(fileLoadedEvent) 
 	{
 		var imageLoaded = document.createElement("img");
@@ -414,15 +443,15 @@ class UiEventHandler
 		(
 			session.tileSizeInPixelsActual
 		);
- 
+
 		session.initializeForImageTileset();
- 
+
 		session.displayImageTileset.drawImage(imageLoaded);
 	}
 
 	selectTool_Changed(selectTool)
 	{
 		var session = Session.Instance();
-		session.toolSelectedName = selectTool.value;
+		session.toolSelectedNameSet(selectTool.value);
 	}
 }

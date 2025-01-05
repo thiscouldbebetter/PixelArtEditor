@@ -29,13 +29,18 @@ class Session
 	{
 		if (Session._instance == null)
 		{
+			var sizeInTiles = new Coords(4, 4);
+			var tileSizeInPixels = new Coords(16, 16);
+			var tileSelectedPosInTiles = Coords.zeroes();
+			var colors = Color.Instances().paletteDefault();
+
 			Session._instance = new Session
 			(
-				new Coords(4, 4), // imageTilesetSizeInTiles
-				new Coords(16, 16), // tileSizeInPixelsActual
-				Coords.zeroes(), // tileSelectedPosInTiles
+				sizeInTiles, // imageTilesetSizeInTiles
+				tileSizeInPixels, // tileSizeInPixelsActual
+				tileSelectedPosInTiles,
 				16, // magnificationFactor
-				Color.Instances().paletteDefault()
+				colors
 			);
 		}
 		return Session._instance;
@@ -76,13 +81,18 @@ class Session
 
 	colorAddToPalette(colorToAdd)
 	{
-		var isColorInPalette = this.colors.some(x => x.equals(colorToAdd));
-		if (isColorNotInPalette == false)
+		var colorIsInPalette =
+			this.colors.some(x => x.equals(colorToAdd) );
+
+		if (colorIsInPalette == false)
 		{
 			this.colors.push(colorToAdd);
 			this.initializePalette();
 		}
-		var wasSuccessful = isColorNotInPalette;
+
+		var wasSuccessful =
+			(colorIsInPalette == false);
+
 		return wasSuccessful;
 	}
 
@@ -94,7 +104,7 @@ class Session
 
 	colorPaletteReset()
 	{
-		this.colors = Session.colorsDefault();
+		this.colors = Color.Instances().paletteDefault();
 		this.initializePalette();
 	}
 
@@ -599,6 +609,12 @@ class Session
 		this.snapshotForUndoSave();
 		UiEventHandler.Instance()
 			.buttonUndoClearSnapshotsCountUpdate();
+	}
+
+	toolSelectedNameSet(value)
+	{
+		this.toolSelectedName = value;
+		return this;
 	}
 
 	undo()
