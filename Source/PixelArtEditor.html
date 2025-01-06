@@ -113,7 +113,35 @@
 		<label>Color Selected:</label>
 		<button id="buttonColorSwatch" style="background-color:Black">&nbsp;</button>
 
-		<button onclick="UiEventHandler.Instance().buttonColorSelectedAddToPalette_Clicked();">Add to Palette</button>
+		<button
+			onclick="UiEventHandler.Instance().buttonColorSelectedDarken_Clicked();"
+		>
+			Darken
+		</button>
+
+		<button
+			onclick="UiEventHandler.Instance().buttonColorSelectedLighten_Clicked();"
+		>
+			Lighten
+		</button>
+
+		<button
+			onclick="UiEventHandler.Instance().buttonColorSelectedSaturate_Clicked();"
+		>
+			Saturate
+		</button>
+
+		<button
+			onclick="UiEventHandler.Instance().buttonColorSelectedDesaturate_Clicked();"
+		>
+			Desaturate
+		</button>
+
+		<button
+			onclick="UiEventHandler.Instance().buttonColorSelectedAddToPalette_Clicked();"
+		>
+			Add to Palette
+		</button>
 
 		<div>
 			<button onclick="UiEventHandler.Instance().buttonColorFromRGB_Clicked();">Set From:</button>
@@ -133,9 +161,21 @@
 
 		<div>
 			<label>Color Palette:</label>
-			<button onclick="UiEventHandler.Instance().buttonPaletteExtract_Clicked();">Extract from Image</button>
-			<button onclick="UiEventHandler.Instance().buttonPaletteReset_Clicked();">Reset</button>
-			<button onclick="UiEventHandler.Instance().buttonPaletteClear_Clicked();">Clear</button>
+			<button
+				onclick="UiEventHandler.Instance().buttonPaletteExtract_Clicked();"
+			>
+				Extract from Image
+			</button>
+			<button
+				onclick="UiEventHandler.Instance().buttonPaletteReset_Clicked();"
+			>
+				Reset
+			</button>
+			<button
+				onclick="UiEventHandler.Instance().buttonPaletteClear_Clicked();"
+			>
+				Clear
+			</button>
 			<div id="divColorsPredefined"></div>
 		</div>
 	</div>

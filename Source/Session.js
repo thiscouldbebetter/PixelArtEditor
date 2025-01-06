@@ -16,6 +16,8 @@ class Session
 		this.magnificationFactor = magnificationFactor;
 		this.colors = colors;
 
+		this.gridColor = Color.Instances().Cyan;
+
 		this.imageTilesetSizeInPixels =
 			this.imageTilesetSizeInTiles.clone().multiply(this.tileSizeInPixelsActual);
 
@@ -58,7 +60,7 @@ class Session
 
 		var buttonColorSwatch = d.getElementById("buttonColorSwatch");
 		buttonColorSwatch.style.backgroundColor =
-			this.colorSelected.systemColor;
+			this.colorSelected.systemColor();
 
 		var inputColorRed = d.getElementById("inputColorRed");
 		var inputColorGreen = d.getElementById("inputColorGreen");
@@ -69,7 +71,7 @@ class Session
 		canvas.width = 1;
 		canvas.height = 1;
 		var g = canvas.getContext("2d");
-		g.fillStyle = this.colorSelected.systemColor;
+		g.fillStyle = this.colorSelected.systemColor();
 		g.fillRect(0, 0, 1, 1);
 		var colorComponentsRGBA = g.getImageData(0, 0, 1, 1).data;
 
@@ -122,19 +124,30 @@ class Session
 		var drawSize =
 			new Coords(1, 1).multiplyScalar(this.magnificationFactor);
 
+		var displayActualSize = this.displayTileSelectedActualSize;
+		var displayMagnified = this.displayTileSelectedMagnified;
+
+		var gridColor = this.gridColor;
+
 		for (var y = 0; y < imageSizeActual.y; y++)
 		{
 			pixelPos.y = y;
 			for (var x = 0; x < imageSizeActual.x; x++)
 			{
 				pixelPos.x = x;
+
 				var pixelColorAsRGBA =
-					this.displayTileSelectedActualSize.pixelAtPosGetAsRGBA(pixelPos);
+					displayActualSize.pixelAtPosGetAsRGBA(pixelPos);
+
 				var pixelColor = new Color(pixelColorAsRGBA);
-				drawPos.overwriteWith(pixelPos).multiplyScalar(this.magnificationFactor);
-				this.displayTileSelectedMagnified.drawRectangleOfSizeAtPosWithColorsFillAndBorder
+
+				drawPos
+					.overwriteWith(pixelPos)
+					.multiplyScalar(this.magnificationFactor);
+
+				displayMagnified.drawRectangleOfSizeAtPosWithColorsFillAndBorder
 				(
-					drawSize, drawPos, pixelColor, null
+					drawSize, drawPos, pixelColor, gridColor
 				);
 			}
 		}
@@ -229,12 +242,21 @@ class Session
 		this.displayTileSelectedMagnified = new Display(this.tileSizeInPixelsMagnified);
 		this.displayTileSelectedMagnified.initialize(divTileSelected);
 		var canvas = this.displayTileSelectedMagnified.canvas;
+		var uiEventHandler = UiEventHandler.Instance();
 		canvas.onmousedown = (event) =>
-			UiEventHandler.Instance().canvasMagnified_MouseDown(event);
+			uiEventHandler.canvasMagnified_MouseDown(event);
 		canvas.onmousemove = (event) =>
-			UiEventHandler.Instance().canvasMagnified_MouseMoved(event);
+			uiEventHandler.canvasMagnified_MouseMoved(event);
 		canvas.onmouseup = (event) =>
-			UiEventHandler.Instance().canvasMagnified_MouseUp(event);
+			uiEventHandler.canvasMagnified_MouseUp(event);
+
+		// Touchscreen events.
+		canvas.ontouchstart = (event) =>
+			uiEventHandler.canvasMagnified_MouseDown(event);
+		canvas.ontouchmove = (event) =>
+			uiEventHandler.canvasMagnified_MouseMoved(event);
+		canvas.ontouchend = (event) =>
+			uiEventHandler.canvasMagnified_MouseUp(event);
 
 		this.displayTileSelectedActualSize = new Display(this.tileSizeInPixelsActual);
 		this.displayTileSelectedActualSize.initialize(divTileSelected);
@@ -267,7 +289,9 @@ class Session
 			var buttonColor = d.createElement("button");
 			buttonColor.color = color; 
 			//buttonColor.innerHTML = "&nbsp;&nbsp;";
-			buttonColor.style.backgroundColor = color.systemColor;
+			buttonColor.style.backgroundColor =
+				color.systemColor();
+
 			var buttonSize =
 				new Coords(1, 2).multiplyScalar(8);
 			buttonColor.style.width = buttonSize.x + "px";
@@ -553,14 +577,14 @@ class Session
 		// Could call .drawMagnified(), but this may be faster,
 		// and thus hopefully more responsive.
 
-		var cellPosInPixels = posInCells.clone().multiply
-		(
-			this.cellSizeInPixels
-		);
+		var cellPosInPixels =
+			posInCells
+				.clone()
+				.multiply(this.cellSizeInPixels);
 
 		this.displayTileSelectedMagnified.drawRectangleOfSizeAtPosWithColorsFillAndBorder
 		(
-			this.cellSizeInPixels, cellPosInPixels, color
+			this.cellSizeInPixels, cellPosInPixels, color, this.gridColor
 		);
 	}
 

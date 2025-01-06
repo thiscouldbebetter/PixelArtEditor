@@ -42,6 +42,38 @@ class UiEventHandler
 		}
 	} 
 
+	buttonColorSelectedDarken_Clicked()
+	{
+		var session = Session.Instance();
+		var colorSelected = session.colorSelected;
+		colorSelected.darken();
+		session.colorSelect(colorSelected);
+	} 
+
+	buttonColorSelectedDesaturate_Clicked()
+	{
+		var session = Session.Instance();
+		var colorSelected = session.colorSelected;
+		colorSelected.desaturate();
+		session.colorSelect(colorSelected);
+	} 
+
+	buttonColorSelectedLighten_Clicked()
+	{
+		var session = Session.Instance();
+		var colorSelected = session.colorSelected;
+		colorSelected.lighten();
+		session.colorSelect(colorSelected);
+	} 
+
+	buttonColorSelectedSaturate_Clicked()
+	{
+		var session = Session.Instance();
+		var colorSelected = session.colorSelected;
+		colorSelected.saturate();
+		session.colorSelect(colorSelected);
+	}
+
 	buttonColor_Clicked(event)
 	{
 		var buttonColor = event.target;
@@ -56,11 +88,11 @@ class UiEventHandler
 		var inputColorGreen = d.getElementById("inputColorGreen");
 		var inputColorBlue = d.getElementById("inputColorBlue");
 		var inputColorAlpha = d.getElementById("inputColorAlpha");
-		var red = inputColorRed.value;
-		var green = inputColorGreen.value;
-		var blue = inputColorBlue.value;
-		var alpha = inputColorAlpha.value;
-		var colorFromRGBA = "rgba(" + red + "," + green + "," + blue + "," + alpha + ")";
+		var red = parseInt(inputColorRed.value);
+		var green = parseInt(inputColorGreen.value);
+		var blue = parseInt(inputColorBlue.value);
+		var alpha = parseFloat(inputColorAlpha.value);
+		var colorFromRGBA = Color.fromComponentsRgba([red, green, blue, alpha]);
 		var session = Session.Instance();
 		session.colorSelect(colorFromRGBA);
 	}
@@ -328,8 +360,11 @@ class UiEventHandler
 
 	canvasMagnified_MouseDownOrMoved(event)
 	{
+		event.preventDefault();
+
 		if (event.buttons == 0)
 		{
+			// todo - This may prevent touchscreen events from working too.
 			return;
 		}
  

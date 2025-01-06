@@ -4,7 +4,6 @@ class Color
 	constructor(componentsRGBA)
 	{
 		this.componentsRGBA = componentsRGBA;
-		this.systemColor = "rgba(" + this.componentsRGBA.join(",") + ")";
 	}
 
 	static Instances()
@@ -26,9 +25,151 @@ class Color
 		return new Color(componentsRgba);
 	}
 
+	cacheClear()
+	{
+		this._systemColor = null;
+	}
+
+	componentBlue()
+	{
+		return this.componentsRGBA[2];
+	}
+
+	componentBlueSet(value)
+	{
+		this.componentsRGBA[2] = value;
+		return this;
+	}
+
+	componentGreen()
+	{
+		return this.componentsRGBA[1];
+	}
+
+	componentGreenSet(value)
+	{
+		this.componentsRGBA[1] = value;
+		return this;
+	}
+
+	componentRed()
+	{
+		return this.componentsRGBA[0];
+	}
+
+	componentRedSet(value)
+	{
+		this.componentsRGBA[0] = value;
+		return this;
+	}
+
+	darken()
+	{
+		alert("Not yet implemented!");
+	}
+
+	desaturate()
+	{
+		alert("Not yet implemented!");
+	}
+
 	equals(other)
 	{
-		return (this.systemColor == other.systemColor);
+		return (this.systemColor() == other.systemColor() );
+	}
+
+	lighten()
+	{
+		alert("Not yet implemented!");
+	}
+
+	luminanceAsFraction()
+	{
+		var sumOfComponents = this.sumOfComponents();
+
+		var luminance = sumOfComponents / (3 * 255);
+
+		return luminance;
+	}
+
+	luminanceAsFractionSet(value)
+	{
+		var sumOfComponents = this.sumOfComponents();
+
+		var red = this.componentRed() / sumOfComponents;
+		var green = this.componentGreen() / sumOfComponents;
+		var blue = this.componentBlue() / sumOfComponents;
+
+		var componentCount = 3;
+		var componentMax = 255;
+		red *= componentMax * componentCount;
+		green *= componentMax * componentCount;
+		blue *= componentMax * componentCount;
+
+		this.componentRedSet(red);
+		this.componentGreenSet(green);
+		this.componentBlueSet(blue);
+
+		this.normalize();
+
+		this.cacheClear();
+
+		return this;
+	}
+
+	multiply(multiplier)
+	{
+		this.componentRedSet(this.componentRed() * multiplier);
+		this.componentGreenSet(this.componentGreen() * multiplier);
+		this.componentBlueSet(this.componentRed() * multiplier);
+		this.normalize();
+		return this;
+	}
+
+	normalize()
+	{
+		for (var i = 0; i < 3; i++)
+		{
+			var component = this.componentsRGBA[i];
+			if (component < 0)
+			{
+				component = 0;
+			}
+			else if (component > 255)
+			{
+				component = 255;
+			}
+			component = Math.round(component);
+			this.componentsRGBA[i] = component;
+		}
+
+		return this;
+	}
+
+	saturate()
+	{
+		alert("Not yet implemented!");
+	}
+
+	sumOfComponents()
+	{
+		var sumOfComponents =
+			this.componentRed()
+			+ this.componentGreen()
+			+ this.componentBlue();
+
+		return sumOfComponents;
+	}
+
+	systemColor()
+	{
+		if (this._systemColor == null)
+		{
+			this._systemColor =
+				"rgba(" + this.componentsRGBA.join(",") + ")";
+		}
+
+		return this._systemColor;
 	}
 }
 

@@ -76,7 +76,7 @@ class Display
  
 	drawPixel(color, pos)
 	{
-		this.graphics.fillStyle = color.systemColor;
+		this.graphics.fillStyle = color.systemColor();
 		this.graphics.fillRect
 		(
 			pos.x, pos.y, 1, 1
@@ -92,7 +92,7 @@ class Display
 
 		if (colorFill != null)
 		{
-			g.fillStyle = colorFill.systemColor;
+			g.fillStyle = colorFill.systemColor();
 			g.fillRect
 			(
 				pos.x, pos.y, size.x, size.y
@@ -101,7 +101,7 @@ class Display
 
 		if (colorBorder != null)
 		{
-			g.strokeStyle = colorBorder.systemColor;
+			g.strokeStyle = colorBorder.systemColor();
 			g.strokeRect
 			(
 				pos.x, pos.y, size.x, size.y
